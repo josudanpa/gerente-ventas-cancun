@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerente de ventas · Gestalt Cancún</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f7f8;
+    --surface: #ffffff;
+    --surface-2: #f1f2f4;
+    --surface-hover: #e7e9ec;
+    --border: #dcdfe3;
+    --border-soft: #e8eaed;
+    --ink: #1a1c20;
+    --ink-soft: #6b6f78;
+    --ink-faint: #9a9ea7;
+
+    --c-positive: #15803d;
+    --c-loss: #b6552f;
+    --c-neutral: #5b5f68;
+    --pill-ink: #f7f7f8;
+
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+
+    --display: 'Space Grotesk', 'Segoe UI', sans-serif;
+    --body: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    line-height: 1.5;
+    padding: 28px 20px 90px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  /* ---------- Header ---------- */
+  .top {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    margin-bottom: 24px; flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-mark {
+    width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+    background: var(--surface-2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; color: var(--ink-soft);
+  }
+  .eyebrow {
+    font-size: 11.5px; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--c-positive); font-weight: 600; margin-bottom: 3px;
+  }
+  h1 { font-family: var(--display); font-size: 22px; margin: 0; letter-spacing: -.01em; color: var(--ink); font-weight: 600; }
+  .status {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-family: var(--mono); padding: 8px 14px;
+    border-radius: 999px; border: 1px solid var(--border); background: var(--surface);
+    color: var(--ink-soft); white-space: pre-wrap; max-width: 420px;
+  }
+  .status::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-faint); flex-shrink: 0; }
+  .status.ok { color: var(--c-positive); border-color: color-mix(in srgb, var(--c-positive) 35%, var(--border)); }
+  .status.ok::before { background: var(--c-positive); box-shadow: 0 0 8px var(--c-positive); }
+  .status.err { color: var(--c-loss); border-color: color-mix(in srgb, var(--c-loss) 35%, var(--border)); }
+  .status.err::before { background: var(--c-loss); }
+  .status.pending::before { background: var(--ink-faint); animation: pulse 1.4s ease-in-out infinite; }
+
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ---------- Panels ---------- */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px 24px;
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .panel::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--border);
+  }
+  .panel-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .panel-icon {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+    background: var(--surface-2); border: 1px solid var(--border-soft);
+    color: var(--ink-soft);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .panel h2 {
+    font-family: var(--display); font-size: 15.5px; font-weight: 600;
+    color: var(--ink); margin: 0; letter-spacing: -.005em;
+  }
+  .help { color: var(--ink-faint); font-size: 12.5px; margin: 0 0 16px; max-width: 720px; line-height: 1.55; }
+
+  /* ---------- Stat cards ---------- */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .stat-card {
+    background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: var(--radius-md);
+    padding: 14px 14px; display: flex; align-items: center; gap: 11px;
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .stat-card:hover { transform: translateY(-2px); border-color: var(--stat-color); }
+  .stat-icon {
+    width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+    background: color-mix(in srgb, var(--stat-color) 18%, transparent); color: var(--stat-color);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .stat-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-faint); font-weight: 600; margin-bottom: 2px; }
+  .stat-value { font-family: var(--display); font-size: 20px; font-weight: 700; color: var(--ink); line-height: 1.15; }
+  .stat-sub { font-size: 11px; color: var(--ink-soft); margin-top: 1px; }
+
+  /* ---------- Form controls ---------- */
+  label.field-label { font-size: 12.5px; color: var(--ink-soft); display: block; margin-bottom: 6px; font-weight: 500; }
+  input[type="date"] {
+    width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-family: var(--body); font-size: 13.5px; background: var(--surface-2); color: var(--ink);
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.2); cursor: pointer; }
+  input:focus-visible, button:focus-visible, .chip:focus-within { outline: 2px solid var(--ink-soft); outline-offset: 2px; }
+
+  .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: end; margin-bottom: 14px; }
+  .row > div { flex: 1; min-width: 170px; }
+
+  .presets { display: flex; gap: 7px; flex-wrap: wrap; margin: 10px 0 4px; }
+  .presets button {
+    background: var(--surface-2); color: var(--ink-soft); border: 1px solid var(--border);
+    font-weight: 500; padding: 6px 13px; font-size: 12.5px; border-radius: 999px;
+  }
+  .presets button:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+  .toggle-group { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; background: var(--surface-2); }
+  .toggle-group label {
+    margin: 0; padding: 7px 15px; font-size: 12.5px; cursor: pointer; color: var(--ink-soft);
+    transition: all .15s ease; font-weight: 500;
+  }
+  .toggle-group label.active { background: var(--ink); color: var(--pill-ink); font-weight: 600; }
+
+  button#btnGenerar {
+    background: var(--ink);
+    color: var(--pill-ink); border: none; padding: 12px 26px;
+    border-radius: 999px; font-size: 14px; font-weight: 700; cursor: pointer;
+    font-family: var(--display); letter-spacing: -.005em;
+    transition: opacity .15s ease, transform .15s ease;
+  }
+  button#btnGenerar:hover { opacity: .92; transform: translateY(-1px); }
+  button#btnGenerar:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 10px;
+    border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2);
+    cursor: pointer; font-size: 12.5px; color: var(--ink-soft); transition: all .15s ease; user-select: none;
+  }
+  .chip input { display: none; }
+  .chip:has(input:checked) {
+    background: var(--surface-hover);
+    border-color: var(--ink-soft); color: var(--ink);
+  }
+  .chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-faint); flex-shrink: 0; }
+  .chip:has(input:checked) .chip-dot { background: var(--ink); }
+  #tagChecks.chips { max-height: 150px; overflow-y: auto; padding: 2px; }
+
+  /* ---------- Tables ---------- */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .table-scroll { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border-soft); animation: fadeUp .35s ease; }
+  th, td { padding: 11px 13px; text-align: right; vertical-align: middle; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th {
+    color: var(--ink-faint); font-weight: 600; text-transform: uppercase; font-size: 10px;
+    letter-spacing: .05em; white-space: nowrap; background: var(--surface-2); border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-bottom: 1px solid var(--border-soft); transition: background .12s ease; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-hover); }
+  td.num, th.num { font-family: var(--mono); }
+  tr.totales { background: var(--surface-2); }
+  tr.totales td { font-weight: 700; font-family: var(--mono); }
+  tr.totales td:first-child { font-family: var(--body); }
+  .numval { display: block; }
+  .pct { display: block; color: var(--c-positive); font-size: 10.5px; margin-top: 1px; font-family: var(--mono); }
+  .meta-progress { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+  .meta-progress-pct { font-family: var(--mono); font-size: 12px; color: var(--ink); min-width: 52px; text-align: right; }
+  .meta-progress-pct--empty { color: var(--ink-faint); }
+  .meta-progress-track { width: 90px; height: 6px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border-soft); overflow: hidden; flex-shrink: 0; }
+  .meta-progress-fill { display: block; height: 100%; border-radius: 999px; background: var(--c-positive); }
+  .motivos { font-size: 11px; color: var(--c-loss); max-width: 170px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help; }
+
+  .avatar {
+    display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;
+    color: #0d0f18; font-weight: 700; font-size: 12px; font-family: var(--display);
+    margin-right: 9px; vertical-align: middle; flex-shrink: 0;
+  }
+  .person-cell { display: flex; align-items: center; }
+
+  details { margin-top: 14px; }
+  summary {
+    cursor: pointer; font-size: 12px; color: var(--ink-faint); display: inline-flex;
+    align-items: center; gap: 6px; padding: 4px 0;
+  }
+  summary:hover { color: var(--ink-soft); }
+  pre {
+    background: #0a0b10; padding: 14px; border-radius: var(--radius-sm); font-family: var(--mono);
+    font-size: 11px; overflow-x: auto; max-height: 320px; color: var(--ink-soft); border: 1px solid var(--border-soft);
+  }
+  .empty { color: var(--ink-faint); font-size: 13px; padding: 28px 0; text-align: center; }
+  .resultsRow { display: block; }
+  .resultsRow > .panel { width: 100%; }
+
+  /* ---------- Calificados: fila de dos columnas ---------- */
+  .calif-row { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; }
+  .calif-row > .panel { flex: 1; min-width: 340px; margin-bottom: 0; }
+  .comparativa-parcial th .col-mes { display: block; font-family: var(--display); font-weight: 600; }
+  .comparativa-parcial th .col-rango { display: block; font-family: var(--mono); font-size: 11px; color: var(--ink-faint); font-weight: 400; margin-top: 2px; }
+  .comparativa-parcial tbody td:first-child { font-weight: 500; }
+  .comparativa-parcial tbody td:nth-last-child(2) .numval { color: var(--ink); font-weight: 600; }
+  .delta { font-family: var(--mono); font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .delta.up { color: var(--c-positive); background: rgba(21, 128, 61, .10); }
+  .delta.down { color: var(--c-loss); background: rgba(182, 85, 47, .10); }
+  .delta.na { color: var(--ink-faint); background: var(--surface-2); }
+  .period-badge {
+    margin-left: auto; font-size: 11.5px; font-family: var(--mono); color: var(--ink-soft);
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px;
+    padding: 6px 13px; white-space: nowrap;
+  }
+  .export-btn {
+    margin-left: auto; display: inline-flex; align-items: center; gap: 7px;
+    background: var(--surface-2); color: var(--ink); border: 1px solid var(--border);
+    font-weight: 600; padding: 8px 15px; font-size: 12.5px; border-radius: 999px; cursor: pointer;
+    font-family: var(--body);
+  }
+  .export-btn:hover { border-color: var(--ink-soft); }
+  .embudo-pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .person-email { display: block; font-size: 11px; color: var(--ink-faint); margin-top: 1px; }
+  .pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+  .pager-info { font-size: 12px; color: var(--ink-faint); }
+  .pager-controls { display: flex; align-items: center; gap: 8px; }
+  .pager-btn {
+    width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2);
+    color: var(--ink-soft); cursor: pointer; font-size: 15px; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .pager-btn:hover:not(:disabled) { color: var(--ink); border-color: var(--ink-soft); }
+  .pager-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .pager-page {
+    min-width: 28px; height: 28px; border-radius: 7px; background: var(--ink); color: var(--pill-ink);
+    font-family: var(--mono); font-weight: 700; font-size: 12.5px; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .lead-link { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--ink-faint); }
+  .lead-link:hover { color: var(--c-positive); border-bottom-color: var(--c-positive); }
+  .embudo-filter-row { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; flex-wrap: wrap; }
+  .embudo-filter-row label { font-size: 12px; color: var(--ink-soft); font-weight: 500; }
+  .embudo-filter-row select {
+    background: var(--surface-2); color: var(--ink); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 7px 10px; font-size: 12.5px; font-family: var(--body); cursor: pointer;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 18px 12px 70px; }
+    .panel { padding: 18px 16px 20px; }
+    .top { align-items: flex-start; }
+    button#btnGenerar { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="brand-mark" id="brandIcon"></div>
+      <div>
+        <div class="eyebrow">Gestalt Cancún · Gerente de ventas</div>
+        <h1>Reporte de desempeño y pipeline</h1>
+      </div>
+    </div>
+    <div class="status pending" id="status">Cargando catálogo…</div>
+  </header>
+
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-icon" id="iconFiltros"></div>
+      <h2>Filtros</h2>
+    </div>
+    <p class="help">Elige el rango de fechas y los filtros que quieras (todos son opcionales) y pulsa «Generar reporte completo».</p>
+
+    <div class="row">
+      <div>
+        <label class="field-label" for="dateFrom">Desde</label>
+        <input type="date" id="dateFrom">
+      </div>
+      <div>
+        <label class="field-label" for="dateTo">Hasta</label>
+        <input type="date" id="dateTo">
+      </div>
+    </div>
+    <div class="presets">
+      <button type="button" data-preset="hoy">Hoy</button>
+      <button type="button" data-preset="semana">Esta semana</button>
+      <button type="button" data-preset="mes">Este mes</button>
+      <button type="button" data-preset="mesPasado">Mes pasado</button>
+    </div>
+    <p class="help" style="margin-top:10px;">
+      <b style="color:var(--ink-soft)">Leads que llegan a los asesores, desempeño, atención y canales</b> cuentan los leads que pasaron a una etapa Hot en ese rango (los delega la IA o los mueve el propio asesor). &nbsp;
+      <b style="color:var(--ink-soft)">Inscritos</b> cuenta las inscripciones registradas en ese rango, sin importar cuándo nació el lead.
+    </p>
+
+    <div style="margin-top:16px;">
+      <label class="field-label">Embudos (vacío = todos)</label>
+      <div class="chips" id="pipelineChecks"><span class="help">Cargando catálogo…</span></div>
+    </div>
+    <div style="margin-top:16px;">
+      <label class="field-label">Asesores (vacío = todos)</label>
+      <div class="chips" id="agentChecks"></div>
+    </div>
+    <div style="margin-top:16px;">
+      <label class="field-label">Etiquetas (vacío = sin filtrar por etiqueta)</label>
+      <div class="chips" id="tagChecks"></div>
+      <p class="help" style="margin-top:8px;">Filtro manual y opcional, aplica a los embudos que estés incluyendo arriba. Si marcas una o más, solo se cuentan los leads que tengan al menos una de esas etiquetas.</p>
+    </div>
+
+    <div style="margin-top:18px;">
+      <label class="field-label">Oportunidades calientes: ¿cuáles incluyo?</label>
+      <div class="toggle-group" id="calificadosToggle">
+        <label class="active" data-value="actual"><span>Todas las que hay ahora</span></label>
+        <label data-value="periodo"><span>Solo las creadas en ese periodo</span></label>
+      </div>
+      <p class="help" style="margin-top:8px;">"Todas las que hay ahora" ignora las fechas de arriba — es la foto completa del embudo hoy. "Solo las creadas en ese periodo" la limita a leads que nacieron en el rango de fechas que pusiste arriba.</p>
+    </div>
+
+    <div style="margin-top:20px;">
+      <button id="btnGenerar">Generar reporte completo</button>
+    </div>
+  </div>
+
+  <div class="resultsRow" id="resultsRow" style="display:none;">
+
+    <!-- Tablero 1 · Leads recibidos por periodo -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-icon" id="iconLeadsPeriodo"></div>
+        <h2>Leads que llegan a los asesores</h2>
+      </div>
+      <p class="help">Leads que pasaron a una etapa Hot en el periodo, ya sea porque la IA los delegó o porque el propio asesor los movió, vistos de dos formas — por asesor y por embudo. Las dos sumas tienen que coincidir: es la misma población de leads, nada más que el desglose es distinto.</p>
+      <div id="leadsPeriodoStats"></div>
+      <p class="help" id="iaResumen" style="margin-bottom:6px;"></p>
+      <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:14px;">
+        <div style="flex:1; min-width:260px;">
+          <h3 style="font-family:var(--display); font-size:12.5px; color:var(--ink-soft); font-weight:600; margin:0 0 8px; text-decoration:underline; text-underline-offset:3px;">Leads que llegan a cada asesor</h3>
+          <p class="help" style="margin-bottom:8px;">Cuántos leads Hot recibió cada asesor en el periodo (delegados por la IA o movidos por él mismo).</p>
+          <div id="leadsPorAsesorTable"></div>
+        </div>
+        <div style="flex:1; min-width:260px;">
+          <h3 style="font-family:var(--display); font-size:12.5px; color:var(--ink-soft); font-weight:600; margin:0 0 8px; text-decoration:underline; text-underline-offset:3px;">Leads que llegan por embudo</h3>
+          <p class="help" style="margin-bottom:8px;">Las metas mensuales por embudo están pendientes de definir; cuando se tengan, aquí se verá el avance de cada una.</p>
+          <div id="leadsPorEmbudoTable"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tablero 2 · Desempeño del periodo -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-icon" id="iconDesempeno"></div>
+        <h2>Desempeño del periodo</h2>
+      </div>
+      <p class="help">De los leads que llegaron a los asesores en el periodo: cuántos llegaron a cita y a documentos, cuántos se inscribieron y cómo se perdieron los que se perdieron. Es la foto de dónde están hoy esos leads.</p>
+      <div id="resultsStats"></div>
+      <div id="resultsTable"></div>
+      <details><summary>JSON crudo</summary><pre id="rawJson"></pre></details>
+    </div>
+
+    <!-- Atención a lo que delega la IA -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-icon" id="iconTiempos"></div>
+        <h2>Atención a los leads que delega la IA</h2>
+      </div>
+      <p class="help">Desde que la IA delega un lead a un asesor (lo pasa a una etapa Hot), cuánto tarda ese asesor en hacer algo con él: mandar un WhatsApp, escribir una nota, completar una tarea o mover la etapa. El tiempo cuenta solo horas de lunes a viernes, de 9:00 a 18:00. Los leads que el propio asesor mueve a Hot no entran aquí: ahí ya empezó él.</p>
+      <div id="atencionStats"></div>
+      <div id="atencionTable"></div>
+      <h3 style="font-family:var(--display); font-size:13px; color:var(--ink-soft); font-weight:600; margin:22px 0 4px; letter-spacing:-.005em;">Delegados sin atender</h3>
+      <p class="help" style="margin-bottom:12px;">Leads que la IA delegó hace más de 24 horas y que su asesor todavía no toca (ni mensaje, ni nota, ni tarea, ni cambio de etapa). Del más antiguo al más reciente.</p>
+      <div id="atencionSinAtender"></div>
+      <div class="help" id="atencionNota" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- Tablero 3 · Inscritos del periodo -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-icon" id="iconGanados"></div>
+        <h2>Inscritos del periodo</h2>
+      </div>
+      <p class="help">Inscripciones registradas por embudo en el rango de fechas elegido (cuenta el día en que el lead pasó a la etapa Inscrito), con el monto total y el ticket promedio. El monto sale del campo <b>Venta</b> de cada lead en Kommo: mientras no se capture ahí, se muestra «—».</p>
+      <div id="ganadosStats"></div>
+      <div id="ganadosTable"></div>
+      <h3 style="font-family:var(--display); font-size:13px; color:var(--ink-soft); font-weight:600; margin:22px 0 4px; letter-spacing:-.005em;">Este periodo vs el anterior y vs el mismo periodo del año pasado</h3>
+      <p class="help" style="margin-bottom:6px;">Inscritos del rango elegido arriba, contra el tramo inmediato anterior (misma duración) y contra las mismas fechas de hace un año. Respeta los filtros de embudos, asesores y etiquetas.</p>
+      <div id="inscritosComparativo"></div>
+      <h3 style="font-family:var(--display); font-size:13px; color:var(--ink-soft); font-weight:600; margin:22px 0 4px; letter-spacing:-.005em;">Desglose de inscritos</h3>
+      <p class="help" style="margin-bottom:12px;">Cada inscripción registrada en el periodo, con contacto, responsable, canal y etiquetas. Ordenado por embudo (alfabético) y luego de mayor a menor monto.</p>
+      <div class="embudo-filter-row">
+        <label for="ganadosEmbudoFiltro">Embudo</label>
+        <select id="ganadosEmbudoFiltro"><option value="">Todos los embudos</option></select>
+      </div>
+      <div id="ganadosDetalleTable"></div>
+    </div>
+
+    <!-- Canales que más inscriben -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-icon" id="iconCanales"></div>
+        <h2>Canales que más inscriben</h2>
+      </div>
+      <p class="help">De qué canal vienen los leads que llegaron a los asesores en el periodo, cuántos llegaron a cita y cuántas inscripciones se registraron. El canal sale de las <b>etiquetas</b> del lead (Facebook/Instagram, Google, sitio web, referidos, eventos y escuelas, llamada o visita directa, base propia); cada lead cuenta en el primer canal que coincida. Los que no traen etiqueta de canal salen aparte: mientras más se etiquete, más exacta esta tabla.</p>
+      <div id="canalesStats"></div>
+      <div id="canalesTable"></div>
+      <details><summary>JSON crudo</summary><pre id="rawJsonCanales"></pre></details>
+    </div>
+
+    <!-- Tablero 4 · Oportunidades calientes -->
+    <div class="calif-row" style="flex-direction:column; flex-wrap:nowrap;">
+      <div class="panel" style="flex:none; width:100%;">
+        <div class="panel-head">
+          <div class="panel-icon" id="iconCalificados"></div>
+          <h2>Oportunidades calientes</h2>
+          <span class="period-badge" id="crosstabPeriodBadge"></span>
+        </div>
+        <p class="help">Quién está ahora mismo en una etapa caliente de cada embudo: Prospecto Hot, Citas Hot, Documentos Hot, Evaluación o Cierre Hot.</p>
+        <div id="crosstabStats"></div>
+        <div id="crosstabTable"></div>
+        <div class="help" id="crosstabExcluidos" style="margin-top:10px;"></div>
+        <details><summary>JSON crudo</summary><pre id="rawJsonCrosstab"></pre></details>
+      </div>
+      <div class="panel" style="flex:none; width:100%;">
+        <div class="panel-head">
+          <div class="panel-icon" id="iconLeadsCalifLista"></div>
+          <h2 id="calificadosListaTitulo">Leads calientes</h2>
+          <button type="button" id="btnExportarCalificados" class="export-btn"><span id="iconExportar"></span><span>Exportar</span></button>
+        </div>
+        <p class="help">Listado de leads en etapas calientes, de la etapa más avanzada a la menos avanzada y, dentro de cada una, de los que llevan más tiempo sin moverse a los más recientes.</p>
+        <div class="embudo-filter-row">
+          <label for="calificadosEmbudoFiltro">Embudo</label>
+          <select id="calificadosEmbudoFiltro"><option value="">Todos los embudos</option></select>
+        </div>
+        <div id="calificadosListaTable"></div>
+        <div id="calificadosListaPaginacion"></div>
+      </div>
+    </div>
+
+    <!-- Tablero 5 · Número de actividades -->
+    <div class="panel" id="actividadPanel">
+      <div class="panel-head">
+        <div class="panel-icon" id="iconActividad"></div>
+        <h2>Actividad diaria por asesor</h2>
+      </div>
+      <p class="help">Lo que cada asesor hizo en Kommo en el rango de fechas: mensajes de WhatsApp enviados, notas, tareas completadas y citas (tareas de tipo Reunión). Sin llamadas: Gestalt no tiene telefonía conectada a Kommo.</p>
+      <div id="actividadStats"></div>
+      <div id="actividadTable"></div>
+      <h3 style="font-family:var(--display); font-size:13px; color:var(--ink-soft); font-weight:600; margin:22px 0 4px; letter-spacing:-.005em;">Actividades por día</h3>
+      <div id="actividadDiaTable"></div>
+      <div class="help" id="actividadNota" style="margin-top:10px;"></div>
+      <details><summary>JSON crudo</summary><pre id="rawJsonActividad"></pre></details>
+    </div>
+  </div>
+
+
+</div>
+
+<script>
+/* ============================== ICONOS ============================== */
+const ICONS = {
+  layers: '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  sliders: '<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
+  target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  dollar: '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+  phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  arrowUpRight: '<line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>',
+  arrowDownLeft: '<line x1="17" y1="7" x2="7" y2="17"/><polyline points="17 17 7 17 7 7"/>',
+  checkCircle: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  xCircle: '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
+  trendingUp: '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+  zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  barChart: '<line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>',
+  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+};
+function icon(name, color, size) {
+  size = size || 18;
+  color = color || 'currentColor';
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[name] || '') + '</svg>';
+}
+function paintIcon(elId, name, color) {
+  const el = document.getElementById(elId);
+  if (el) el.innerHTML = icon(name, color, 20);
+}
+function statCard(name, color, label, value, sub) {
+  return '<div class="stat-card" style="--stat-color:' + color + '">' +
+    '<div class="stat-icon">' + icon(name, color, 18) + '</div>' +
+    '<div><div class="stat-label">' + label + '</div><div class="stat-value">' + value + '</div>' +
+    (sub ? '<div class="stat-sub">' + sub + '</div>' : '') + '</div></div>';
+}
+function hashHue(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 360;
+  return Math.abs(h);
+}
+function avatarHtml(name) {
+  const initials = name.split(/\s+/).filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase() || '?';
+  const hue = hashHue(name);
+  return '<span class="avatar" style="width:28px;height:28px;background:hsl(' + hue + ' 22% 32%)">' + initials + '</span>';
+}
+
+paintIcon('brandIcon', 'layers', '#0f1117');
+paintIcon('iconFiltros', 'sliders', 'var(--c-neutral)');
+paintIcon('iconLeadsPeriodo', 'layers', 'var(--ink-soft)');
+paintIcon('iconDesempeno', 'layers', 'var(--ink-soft)');
+paintIcon('iconCalificados', 'target', 'var(--c-positive)');
+paintIcon('iconGanados', 'checkCircle', 'var(--c-positive)');
+paintIcon('iconCanales', 'barChart', 'var(--c-neutral)');
+paintIcon('iconActividad', 'zap', 'var(--ink-soft)');
+paintIcon('iconTiempos', 'clock', 'var(--ink-soft)');
+paintIcon('iconLeadsCalifLista', 'users', 'var(--c-positive)');
+paintIcon('iconExportar', 'download', 'var(--ink)');
+
+/* ============================== DATOS ============================== */
+const WEBHOOK_URL = "https://digital-crew-n8n.xrzfaj.easypanel.host/webhook/GERENTE-VENTAS-GESTALT-CANCUN";
+const KOMMO_SUBDOMAIN = "direccioncancun";
+function kommoLeadUrl(leadId) { return `https://${KOMMO_SUBDOMAIN}.kommo.com/leads/detail/${leadId}`; }
+function leadLinkHtml(leadId, texto) {
+  if (leadId == null) return texto;
+  return `<a class="lead-link" href="${kommoLeadUrl(leadId)}" target="_blank" rel="noopener noreferrer">${texto}</a>`;
+}
+
+// Las claves de embudo del flujo se muestran con su nombre de Kommo.
+const NOMBRES_EMBUDO = {
+  embudo_general: 'Embudo general',
+  pull_licenciaturas: 'Pull Licenciaturas',
+  push_licenciaturas: 'Push Licenciaturas',
+};
+function nombreEmbudo(key) { return NOMBRES_EMBUDO[key] || key; }
+
+// El monto sale del campo Venta del lead; mientras nadie lo capture se muestra «—» en vez de $0.
+function fmtMonto(n) { return n ? '$' + Math.round(n).toLocaleString('es-MX') : '—'; }
+function fmtNum(n) { return Number(n || 0).toLocaleString('es-MX'); }
+// Porcentaje con un decimal cuando es menor a 1% (si no, 4 de 2,565 se vería como 0%).
+function pctF(n, total) {
+  if (!total) return '—';
+  const v = (n / total) * 100;
+  if (v > 0 && v < 1) return v.toFixed(1) + '%';
+  return Math.round(v) + '%';
+}
+
+const els = {
+  dateFrom: document.getElementById('dateFrom'),
+  dateTo: document.getElementById('dateTo'),
+  pipelineChecks: document.getElementById('pipelineChecks'),
+  agentChecks: document.getElementById('agentChecks'),
+  tagChecks: document.getElementById('tagChecks'),
+  btnGenerar: document.getElementById('btnGenerar'),
+  calificadosToggle: document.getElementById('calificadosToggle'),
+  status: document.getElementById('status'),
+  resultsRow: document.getElementById('resultsRow'),
+  resultsStats: document.getElementById('resultsStats'),
+  resultsTable: document.getElementById('resultsTable'),
+  rawJson: document.getElementById('rawJson'),
+  leadsPeriodoStats: document.getElementById('leadsPeriodoStats'),
+  leadsPorAsesorTable: document.getElementById('leadsPorAsesorTable'),
+  leadsPorEmbudoTable: document.getElementById('leadsPorEmbudoTable'),
+  crosstabStats: document.getElementById('crosstabStats'),
+  crosstabTable: document.getElementById('crosstabTable'),
+  crosstabExcluidos: document.getElementById('crosstabExcluidos'),
+  rawJsonCrosstab: document.getElementById('rawJsonCrosstab'),
+  crosstabPeriodBadge: document.getElementById('crosstabPeriodBadge'),
+  calificadosListaTitulo: document.getElementById('calificadosListaTitulo'),
+  calificadosListaTable: document.getElementById('calificadosListaTable'),
+  calificadosListaPaginacion: document.getElementById('calificadosListaPaginacion'),
+  btnExportarCalificados: document.getElementById('btnExportarCalificados'),
+  calificadosEmbudoFiltro: document.getElementById('calificadosEmbudoFiltro'),
+  ganadosStats: document.getElementById('ganadosStats'),
+  ganadosTable: document.getElementById('ganadosTable'),
+  ganadosDetalleTable: document.getElementById('ganadosDetalleTable'),
+  ganadosEmbudoFiltro: document.getElementById('ganadosEmbudoFiltro'),
+  inscritosComparativo: document.getElementById('inscritosComparativo'),
+  canalesStats: document.getElementById('canalesStats'),
+  canalesTable: document.getElementById('canalesTable'),
+  rawJsonCanales: document.getElementById('rawJsonCanales'),
+  actividadStats: document.getElementById('actividadStats'),
+  actividadTable: document.getElementById('actividadTable'),
+  actividadDiaTable: document.getElementById('actividadDiaTable'),
+  actividadNota: document.getElementById('actividadNota'),
+  rawJsonActividad: document.getElementById('rawJsonActividad'),
+  iaResumen: document.getElementById('iaResumen'),
+  atencionStats: document.getElementById('atencionStats'),
+  atencionTable: document.getElementById('atencionTable'),
+  atencionSinAtender: document.getElementById('atencionSinAtender'),
+  atencionNota: document.getElementById('atencionNota'),
+};
+
+let calificadosMode = 'actual';
+let agentsCatalog = [];
+
+els.calificadosToggle.addEventListener('click', (e) => {
+  const label = e.target.closest('label');
+  if (!label) return;
+  [...els.calificadosToggle.children].forEach(l => l.classList.remove('active'));
+  label.classList.add('active');
+  calificadosMode = label.dataset.value;
+});
+
+els.btnExportarCalificados.addEventListener('click', descargarCsvCalificados);
+
+els.calificadosEmbudoFiltro.addEventListener('change', () => {
+  calificadosEmbudoFiltro = els.calificadosEmbudoFiltro.value;
+  calificadosListaPage = 1;
+  renderLeadsCalificadosListado();
+});
+
+els.ganadosEmbudoFiltro.addEventListener('change', () => {
+  ganadosEmbudoFiltro = els.ganadosEmbudoFiltro.value;
+  renderGanadosDetalleTabla();
+});
+
+// Formatea una fecha LOCAL como YYYY-MM-DD. Ojo: no usar toISOString(), que
+// convierte a UTC -- en México (UTC-6) eso adelantaba "hoy" al día siguiente a
+// partir de las 18:00, así que un reporte corrido en la tarde pedía a Kommo un
+// rango que terminaba mañana.
+function fmt(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+document.querySelectorAll('[data-preset]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const today = new Date();
+    let from, to;
+    if (btn.dataset.preset === 'hoy') { from = today; to = today; }
+    if (btn.dataset.preset === 'semana') {
+      const day = (today.getDay() + 6) % 7;
+      from = new Date(today); from.setDate(today.getDate() - day);
+      to = today;
+    }
+    if (btn.dataset.preset === 'mes') {
+      from = new Date(today.getFullYear(), today.getMonth(), 1);
+      to = today;
+    }
+    if (btn.dataset.preset === 'mesPasado') {
+      from = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+      to = new Date(today.getFullYear(), today.getMonth(), 0);
+    }
+    els.dateFrom.value = fmt(from);
+    els.dateTo.value = fmt(to);
+  });
+});
+
+(function setDefaultDates() {
+  const today = new Date();
+  const first = new Date(today.getFullYear(), today.getMonth(), 1);
+  els.dateFrom.value = fmt(first);
+  els.dateTo.value = fmt(today);
+})();
+
+function setStatus(text, kind) { els.status.textContent = text; els.status.className = 'status ' + kind; }
+
+function extractPayload(data, requiredKey) {
+  const candidates = [data, Array.isArray(data) ? data[0] : null, Array.isArray(data) && data[0] ? data[0].json : null];
+  for (const c of candidates) { if (c && typeof c === 'object' && requiredKey in c) return c; }
+  throw new Error(`La respuesta no tiene la forma esperada (busqué "${requiredKey}"). Respuesta cruda:\n` + JSON.stringify(data, null, 2).slice(0, 1500));
+}
+
+// ---------------------------------------------------------------------------
+// El webhook de n8n regresa 200 con el cuerpo VACÍO cuando le llegan demasiadas
+// llamadas al mismo tiempo (confirmado en el log de ejecuciones de n8n: las
+// corridas concurrentes SIEMPRE terminan en "success" ahí -- Kommo no las está
+// rechazando, el workflow no truena -- así que lo que se pierde es la entrega
+// de la respuesta HTTP de vuelta, probablemente por presión de CPU/memoria en
+// el contenedor de n8n en easypanel cuando hay varias ejecuciones pesadas al
+// mismo tiempo. Cada llamada "performance" ya hace de por sí varias idas y
+// vueltas a Kommo -- leads paginados, historial de eventos de los perdidos,
+// nombres de contactos/compañías -- así que no es una sola consulta liviana).
+//
+// El límite se aplica por "carril" (pool), no global: el lote inicial de 4
+// tipos de vista distintos (performance/crosstab/calls/response_times) ya
+// corría en paralelo desde antes de que existiera este archivo y nunca dio
+// problema, así que se queda sin tope. El problema real solo se vio en los
+// barridos mensuales repetidos (mismo tipo de llamada N veces) cuando pasaron
+// de 2 a 3 comparativos en paralelo el 18-sep-2026 -- ahí sí se queda el tope.
+// Reintenta porque son consultas de solo lectura: repetirlas es seguro, y una
+// respuesta vacía es transitoria (n8n saturado en ese instante, no un dato).
+// ---------------------------------------------------------------------------
+const LIMITE_POR_CARRIL = { barrido: 2 }; // sin entrada = sin tope
+const REINTENTOS_WEBHOOK = 3;
+const estadoCarriles = {};
+
+function tomarTurnoWebhook(carril) {
+  const limite = LIMITE_POR_CARRIL[carril];
+  if (limite == null) return Promise.resolve(); // carril sin tope (p.ej. "inicial")
+  if (!estadoCarriles[carril]) estadoCarriles[carril] = { enVuelo: 0, espera: [] };
+  const e = estadoCarriles[carril];
+  if (e.enVuelo < limite) { e.enVuelo++; return Promise.resolve(); }
+  return new Promise(resolve => e.espera.push(resolve));
+}
+function soltarTurnoWebhook(carril) {
+  const e = estadoCarriles[carril];
+  if (!e) return; // carril sin tope, nunca se registró
+  const siguiente = e.espera.shift();
+  if (siguiente) siguiente(); else e.enVuelo--;
+}
+
+async function callWebhook(body, carril = 'barrido') {
+  await tomarTurnoWebhook(carril);
+  try {
+    let ultimoMotivo = '';
+    for (let intento = 1; intento <= REINTENTOS_WEBHOOK; intento++) {
+      const res = await fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (!res.ok) throw new Error(`El webhook respondió ${res.status}. Revisa que el workflow esté activo en n8n.`);
+      const texto = await res.text();
+      if (texto.trim()) {
+        try { return JSON.parse(texto); }
+        catch (err) { ultimoMotivo = 'la respuesta no venía en JSON'; }
+      } else {
+        ultimoMotivo = 'el webhook respondió vacío';
+      }
+      if (intento < REINTENTOS_WEBHOOK) await new Promise(r => setTimeout(r, 1500 * intento));
+    }
+    throw new Error(`El webhook falló ${REINTENTOS_WEBHOOK} veces seguidas (${ultimoMotivo}). Suele ser n8n saturado: vuelve a generar el reporte en un minuto.`);
+  } finally {
+    soltarTurnoWebhook(carril);
+  }
+}
+
+function pct(n, total) { return total ? Math.round((n / total) * 100) + '%' : '0%'; }
+
+(async function cargarCatalogo() {
+  try {
+    const data = await callWebhook({ type: 'scan' });
+    const scanData = extractPayload(data, 'pipelines');
+    agentsCatalog = scanData.agents || [];
+    els.pipelineChecks.innerHTML = scanData.pipelines.map(p => `<label class="chip"><input type="checkbox" value="${p.id}" class="pipelineCheck"><span class="chip-dot"></span>${p.name}</label>`).join('');
+    els.agentChecks.innerHTML = scanData.agents.map(a => `<label class="chip"><input type="checkbox" value="${a.id}" class="agentCheck"><span class="chip-dot"></span>${a.name}</label>`).join('');
+    els.tagChecks.innerHTML = (scanData.tags || []).map(t => `<label class="chip"><input type="checkbox" value="${t.id}" class="tagCheck"><span class="chip-dot"></span>${t.name}</label>`).join('') || '<span class="help">Sin etiquetas en la cuenta.</span>';
+    setStatus('Catálogo listo.', 'ok');
+  } catch (err) {
+    setStatus('No se pudo cargar el catálogo: ' + err.message, 'err');
+    console.error(err);
+  }
+})();
+
+els.btnGenerar.addEventListener('click', async () => {
+  if (!els.dateFrom.value || !els.dateTo.value) {
+    setStatus('Falta elegir el rango de fechas.', 'err');
+    return;
+  }
+  const pipelineIds = [...document.querySelectorAll('.pipelineCheck:checked')].map(c => Number(c.value));
+  const agentIds = [...document.querySelectorAll('.agentCheck:checked')].map(c => Number(c.value));
+  const tagIds = [...document.querySelectorAll('.tagCheck:checked')].map(c => Number(c.value));
+  const desde = els.dateFrom.value;
+  const hasta = els.dateTo.value;
+  const useSnapshot = calificadosMode === 'actual';
+
+  els.btnGenerar.disabled = true;
+  els.resultsRow.style.display = 'none';
+  setStatus('Generando el reporte: lo que llega a los asesores, atención, inscritos y oportunidades calientes…', 'pending');
+
+  try {
+    const filtros = { pipelineIds, agentIds, tagIds };
+    const base = { type: 'leads', pipeline_ids: pipelineIds, agent_ids: agentIds, tag_ids: tagIds };
+    const crossBody = { ...base, view: 'qualified_crosstab' };
+    if (!useSnapshot) { crossBody.date_from = desde; crossBody.date_to = hasta; }
+
+    // Bloque 1: lo que llega a los asesores (la IA lo delega a una etapa Hot o el propio asesor lo mueve), inscritos (por fecha de inscripción) y oportunidades calientes
+    const [advData, closedData, crossData] = await Promise.all([
+      callWebhook({ ...base, view: 'advisors', date_from: desde, date_to: hasta }, 'inicial'),
+      callWebhook({ ...base, view: 'performance', date_from: desde, date_to: hasta, filter_by: 'enrolled_at' }, 'inicial'),
+      callWebhook(crossBody, 'inicial'),
+    ]);
+    const advPayload = extractPayload(advData, 'por_asesor');
+    const closedPayload = extractPayload(closedData, 'por_embudo');
+    const crossPayload = extractPayload(crossData, 'totales');
+
+    renderLeadsPorPeriodo(advPayload);
+    renderResultados(advPayload);
+    renderAtencion(advPayload);
+    renderGanados(closedPayload);
+    renderCanales(advPayload, closedPayload);
+    renderCrosstab(crossPayload);
+    els.rawJson.textContent = JSON.stringify(advData, null, 2);
+    els.rawJsonCanales.textContent = JSON.stringify({ llegaron_a_asesores: advPayload.por_canal, inscritos_del_periodo: closedPayload.por_canal }, null, 2);
+    els.rawJsonCrosstab.textContent = JSON.stringify(crossData, null, 2);
+    els.resultsRow.style.display = 'block';
+    els.actividadStats.innerHTML = '';
+    els.actividadTable.innerHTML = '<div class="empty">Cargando actividad…</div>';
+    els.actividadDiaTable.innerHTML = '';
+    setStatus('Leads, desempeño, atención e inscritos listos. Cargando actividad y comparativos…', 'pending');
+
+    // Bloque 2: actividad por asesor (si falla, no tira el resto)
+    try {
+      const actData = await callWebhook({ type: 'leads', view: 'activities', date_from: desde, date_to: hasta, agent_ids: agentIds }, 'inicial');
+      renderActividad(extractPayload(actData, 'por_asesor'));
+      els.rawJsonActividad.textContent = JSON.stringify(actData, null, 2);
+    } catch (err) {
+      els.actividadStats.innerHTML = '';
+      els.actividadDiaTable.innerHTML = '';
+      els.actividadTable.innerHTML = '<div class="empty">No se pudo cargar la actividad: ' + err.message + '</div>';
+      console.error(err);
+    }
+
+    // Bloque 3: inscritos contra el periodo anterior y contra el año anterior
+    await cargarComparativoInscritos(filtros, desde, hasta, closedPayload);
+
+    const totalLlegaron = Object.values(advPayload.por_embudo || {}).reduce((s, e) => s + e.llegaron, 0);
+    const totalInscritos = Object.values(closedPayload.por_embudo || {}).reduce((s, e) => s + e.ganado, 0);
+    setStatus(`Listo · ${fmtNum(totalLlegaron)} leads llegaron a asesores · ${fmtNum(totalInscritos)} inscritos · ${fmtNum(crossPayload.totales.leads_calificados)} oportunidades calientes`, 'ok');
+  } catch (err) {
+    setStatus('No se pudo generar el reporte: ' + err.message, 'err');
+    console.error(err);
+  } finally {
+    els.btnGenerar.disabled = false;
+  }
+});
+
+/* ============================== RENDER: Leads por periodo ============================== */
+function miniTabla(rows, labelCol) {
+  if (!rows.length) return '<div class="empty">Sin datos.</div>';
+  const total = rows.reduce((s, r) => s + r.valor, 0);
+  const filas = rows.map(r => `
+    <tr>
+      <td>${r.etiqueta}</td>
+      <td class="num"><span class="numval">${r.valor}</span></td>
+    </tr>`).join('');
+  return `
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>${labelCol}</th><th class="num">Leads</th></tr></thead>
+      <tbody>${filas}
+        <tr class="totales"><td>Total</td><td class="num"><span class="numval">${total}</span></td></tr>
+      </tbody>
+    </table>
+    </div>`;
+}
+
+// Metas mensuales fijas por embudo (pendiente moverlas a un config editable);
+// el % y la barra se recalculan solos cada vez que cambian los leads.
+const METAS_MENSUALES = {
+  // Sin metas definidas todavía: agrega por clave de embudo, p.ej. push_licenciaturas: 120
+};
+
+function metaProgressHtml(valor, meta) {
+  if (!meta) {
+    return '<div class="meta-progress">' +
+      '<span class="meta-progress-pct meta-progress-pct--empty">–</span>' +
+      '<span class="meta-progress-track"><span class="meta-progress-fill" style="width:0%"></span></span>' +
+      '</div>';
+  }
+  const pctNum = (valor / meta) * 100;
+  const fillWidth = Math.min(pctNum, 100);
+  return '<div class="meta-progress">' +
+    '<span class="meta-progress-pct">' + pctNum.toFixed(1) + '%</span>' +
+    '<span class="meta-progress-track"><span class="meta-progress-fill" style="width:' + fillWidth + '%"></span></span>' +
+    '</div>';
+}
+
+function tablaLeadsPorEmbudo(rows) {
+  if (!rows.length) return '<div class="empty">Sin datos.</div>';
+  const total = rows.reduce((s, r) => s + r.valor, 0);
+  const filas = rows.map(r => {
+    const meta = METAS_MENSUALES[r.clave] || null;
+    return `
+    <tr>
+      <td>${r.etiqueta}</td>
+      <td class="num">${meta || '–'}</td>
+      <td class="num"><span class="numval">${r.valor}</span></td>
+      <td class="num">${metaProgressHtml(r.valor, meta)}</td>
+    </tr>`;
+  }).join('');
+  return `
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Embudo</th><th class="num">Meta mensual</th><th class="num">Leads</th><th class="num">% Meta cumplida</th></tr></thead>
+      <tbody>${filas}
+        <tr class="totales"><td>Total</td><td class="num">–</td><td class="num"><span class="numval">${total}</span></td><td class="num">–</td></tr>
+      </tbody>
+    </table>
+    </div>`;
+}
+
+function renderLeadsPorPeriodo(payload) {
+  const porAsesor = Object.values(payload.por_asesor || {});
+  const porEmbudo = Object.values(payload.por_embudo || {});
+  const ia = payload.resumen_ia || {};
+
+  const filasAsesor = porAsesor
+    .map(a => ({ etiqueta: a.nombre || nombreAgente(a.agent_id), valor: a.llegaron }))
+    .filter(r => r.valor > 0)
+    .sort((a, b) => b.valor - a.valor);
+  const filasEmbudo = porEmbudo
+    .map(e => ({ etiqueta: nombreEmbudo(e.embudo), clave: e.embudo, valor: e.llegaron }))
+    .filter(r => r.valor > 0)
+    .sort((a, b) => b.valor - a.valor);
+
+  const totalAsesor = filasAsesor.reduce((s, r) => s + r.valor, 0);
+  const totalEmbudo = filasEmbudo.reduce((s, r) => s + r.valor, 0);
+
+  els.leadsPeriodoStats.innerHTML = '<div class="stats-row">' +
+    statCard('layers', 'var(--ink-soft)', 'Llegaron a los asesores', fmtNum(totalAsesor), 'pasaron a una etapa Hot en el periodo') +
+    statCard('zap', 'var(--c-positive)', 'Delegados por la IA', fmtNum(ia.delegados_ia)) +
+    statCard('users', 'var(--ink-soft)', 'Movidos a Hot por el asesor', fmtNum(ia.movidos_por_asesores)) +
+    statCard('users', 'var(--ink-soft)', 'Asesores con leads', filasAsesor.length) +
+    (totalAsesor !== totalEmbudo
+      ? statCard('xCircle', 'var(--c-loss)', 'Revisar', 'sumas no coinciden (' + totalAsesor + ' vs ' + totalEmbudo + ')')
+      : '') +
+    '</div>';
+
+  // Lo de la IA, en una sola línea: no se audita a la IA, solo se dice cuánto recibió y cuánto pasó a los asesores.
+  els.iaResumen.innerHTML = '<b style="color:var(--ink-soft)">La IA recibió ' + fmtNum(ia.leads_nuevos) + ' leads nuevos en el periodo</b> y los atiende primero. ' +
+    'A los asesores solo les llega lo que pasa a una etapa Hot; lo demás (bases importadas, leads fríos) se queda con la IA y no cuenta en las métricas de los asesores.';
+
+  els.leadsPorAsesorTable.innerHTML = miniTabla(filasAsesor, 'Asesor');
+  els.leadsPorEmbudoTable.innerHTML = tablaLeadsPorEmbudo(filasEmbudo);
+}
+
+/* ============================== RENDER: Desempeño ============================== */
+function renderResultados(payload) {
+  const embudos = Object.values(payload.por_embudo || {}).filter(e => e.llegaron > 0);
+  if (!embudos.length) { els.resultsStats.innerHTML = ''; els.resultsTable.innerHTML = '<div class="empty">Ningún lead llegó a los asesores en este periodo con estos filtros.</div>'; return; }
+  const t = embudos.reduce((acc, e) => {
+    acc.llegaron += e.llegaron; acc.cita += e.cita; acc.docs += e.docs;
+    acc.ganado += e.ganado; acc.perdido += e.perdido; acc.monto_ganado += e.monto_ganado;
+    return acc;
+  }, { llegaron: 0, cita: 0, docs: 0, ganado: 0, perdido: 0, monto_ganado: 0 });
+
+  els.resultsStats.innerHTML = '<div class="stats-row">' +
+    statCard('layers', 'var(--ink-soft)', 'Llegaron a los asesores', fmtNum(t.llegaron)) +
+    statCard('target', 'var(--c-positive)', 'Cita al plantel', fmtNum(t.cita), pctF(t.cita, t.llegaron) + ' de los que llegaron') +
+    statCard('checkCircle', 'var(--c-positive)', 'Documentos', fmtNum(t.docs), pctF(t.docs, t.llegaron) + ' de los que llegaron') +
+    statCard('checkCircle', 'var(--c-positive)', 'Inscripción', fmtNum(t.ganado), pctF(t.ganado, t.llegaron) + ' de los que llegaron') +
+    statCard('xCircle', 'var(--c-loss)', 'Perdidos', fmtNum(t.perdido)) +
+    '</div>';
+
+  const celda = (n, total) => `<td class="num"><span class="numval">${fmtNum(n)}</span><span class="pct">${pctF(n, total)}</span></td>`;
+  const rows = embudos.map(e => {
+    const motivosOrdenados = Object.entries(e.motivos_perdida || {}).sort((a, b) => b[1] - a[1]);
+    const motivosCompleto = motivosOrdenados.map(([m, c]) => `${m} (${c})`).join(', ') || 'Sin pérdidas';
+    const motivosCorto = motivosOrdenados.slice(0, 1).map(([m, c]) => `${m} (${c})`).join(', ')
+      + (motivosOrdenados.length > 1 ? ` +${motivosOrdenados.length - 1} más` : '') || '—';
+    return `
+    <tr>
+      <td>${nombreEmbudo(e.embudo)}</td>
+      <td class="num"><span class="numval">${fmtNum(e.llegaron)}</span></td>
+      ${celda(e.cita, e.llegaron)}
+      ${celda(e.docs, e.llegaron)}
+      <td class="num"><span class="numval">${fmtNum(e.ganado)}</span></td>
+      <td class="num"><span class="numval">${fmtMonto(e.monto_ganado)}</span></td>
+      <td class="num"><span class="numval">${pctF(e.ganado, e.llegaron)}</span></td>
+      <td class="num"><span class="numval">${fmtNum(e.perdido)}</span></td>
+      <td class="motivos" title="${motivosCompleto}">${motivosCorto}</td>
+    </tr>`;
+  }).join('');
+
+  els.resultsTable.innerHTML = `
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Embudo</th><th class="num">Llegaron</th><th class="num">Cita</th><th class="num">Documentos</th><th class="num">Inscrito</th><th class="num">Monto</th><th class="num">Tasa de inscripción</th><th class="num">Perdido</th><th>Motivos</th></tr></thead>
+      <tbody>${rows}
+        <tr class="totales">
+          <td>Total</td><td class="num"><span class="numval">${fmtNum(t.llegaron)}</span></td>
+          ${celda(t.cita, t.llegaron)}
+          ${celda(t.docs, t.llegaron)}
+          <td class="num"><span class="numval">${fmtNum(t.ganado)}</span></td><td class="num"><span class="numval">${fmtMonto(t.monto_ganado)}</span></td>
+          <td class="num"><span class="numval">${pctF(t.ganado, t.llegaron)}</span></td>
+          <td class="num"><span class="numval">${fmtNum(t.perdido)}</span></td><td></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>`;
+}
+
+/* ============================== RENDER: Canales que más inscriben ============================== */
+function renderCanales(perf, cierres) {
+  const mapa = {};
+  const nuevo = (c) => ({ clave: c.clave, nombre: c.nombre, leads: 0, citas: 0, inscritos: 0, monto: 0 });
+  // leads y citas: leads que LLEGARON a los asesores en el periodo; inscritos y monto: inscripciones REGISTRADAS en el periodo
+  for (const c of (perf.por_canal || [])) { const x = mapa[c.clave] || (mapa[c.clave] = nuevo(c)); x.leads = c.leads; x.citas = c.citas; }
+  for (const c of (cierres.por_canal || [])) { const x = mapa[c.clave] || (mapa[c.clave] = nuevo(c)); x.inscritos = c.inscritos; x.monto = c.monto; }
+  const filas = Object.values(mapa).filter(c => c.leads || c.inscritos);
+  filas.sort((a, b) => ((a.clave === 'sin_canal') - (b.clave === 'sin_canal')) || (b.inscritos - a.inscritos) || (b.leads - a.leads));
+
+  if (!filas.length) {
+    els.canalesStats.innerHTML = '';
+    els.canalesTable.innerHTML = '<div class="empty">Sin leads ni inscripciones en este periodo con estos filtros.</div>';
+    return;
+  }
+
+  const totalLeads = filas.reduce((s, c) => s + c.leads, 0);
+  const totalInscritos = filas.reduce((s, c) => s + c.inscritos, 0);
+  const sinCanal = mapa.sin_canal ? mapa.sin_canal.leads : 0;
+  const mejor = filas.filter(c => c.clave !== 'sin_canal' && c.inscritos > 0).sort((a, b) => b.inscritos - a.inscritos)[0];
+
+  els.canalesStats.innerHTML = '<div class="stats-row">' +
+    statCard('trendingUp', 'var(--c-positive)', 'Canal que más inscribe', mejor ? mejor.nombre : '—',
+      mejor ? fmtNum(mejor.inscritos) + ' inscritos en el periodo' : 'Ninguna inscripción con canal etiquetado') +
+    statCard('barChart', 'var(--ink-soft)', 'Inscritos del periodo', fmtNum(totalInscritos)) +
+    statCard('layers', 'var(--c-neutral)', 'Llegaron sin etiqueta de canal', pctF(sinCanal, totalLeads), fmtNum(sinCanal) + ' de ' + fmtNum(totalLeads) + ' leads') +
+    '</div>';
+
+  const rows = filas.map(c => `
+    <tr${c.clave === 'sin_canal' ? ' style="color:var(--ink-faint)"' : ''}>
+      <td>${c.nombre}</td>
+      <td class="num"><span class="numval">${fmtNum(c.leads)}</span></td>
+      <td class="num"><span class="numval">${fmtNum(c.citas)}</span><span class="pct">${pctF(c.citas, c.leads)}</span></td>
+      <td class="num"><span class="numval">${fmtNum(c.inscritos)}</span></td>
+      <td class="num"><span class="numval">${c.leads ? pctF(c.inscritos, c.leads) : '—'}</span></td>
+      <td class="num"><span class="numval">${fmtMonto(c.monto)}</span></td>
+    </tr>`).join('');
+  els.canalesTable.innerHTML = `
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Canal</th><th class="num">Llegaron a asesores</th><th class="num">Llegaron a cita</th><th class="num">Inscritos del periodo</th><th class="num">Inscritos / llegaron</th><th class="num">Monto</th></tr></thead>
+      <tbody>${rows}
+        <tr class="totales">
+          <td>Total</td>
+          <td class="num"><span class="numval">${fmtNum(totalLeads)}</span></td>
+          <td class="num"><span class="numval">${fmtNum(filas.reduce((s, c) => s + c.citas, 0))}</span></td>
+          <td class="num"><span class="numval">${fmtNum(totalInscritos)}</span></td>
+          <td class="num"><span class="numval">${totalLeads ? pctF(totalInscritos, totalLeads) : '—'}</span></td>
+          <td class="num"><span class="numval">${fmtMonto(filas.reduce((s, c) => s + c.monto, 0))}</span></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>`;
+}
+
+/* ============================== RENDER: Oportunidades calientes ============================== */
+let leadsCalificadosDetalleData = [];
+let calificadosListaPage = 1;
+let calificadosEmbudoFiltro = '';
+const CALIFICADOS_PAGE_SIZE = 10;
+
+function actualizarBadgePeriodoCrosstab() {
+  if (calificadosMode === 'actual') {
+    els.crosstabPeriodBadge.textContent = 'Todas las actuales';
+  } else {
+    els.crosstabPeriodBadge.textContent = `${els.dateFrom.value} → ${els.dateTo.value}`;
+  }
+}
+
+function pillHtml(texto, claveColor) {
+  const hue = hashHue(claveColor || texto);
+  return '<span class="embudo-pill" style="background:hsl(' + hue + ' 35% 18%); color:hsl(' + hue + ' 70% 75%); border:1px solid hsl(' + hue + ' 35% 30%)">' + texto + '</span>';
+}
+function embudoPillHtml(key) { return pillHtml(nombreEmbudo(key), key); }
+
+function personConCorreoHtml(nombre, correo, leadId) {
+  return '<span class="person-cell">' + avatarHtml(nombre) +
+    '<span><span>' + leadLinkHtml(leadId, nombre) + '</span>' + (correo ? '<span class="person-email">' + correo + '</span>' : '') + '</span></span>';
+}
+
+function haceCuanto(tsSegundos) {
+  if (!tsSegundos) return { texto: '—', dias: null };
+  const dias = Math.max(0, Math.floor((Date.now() / 1000 - tsSegundos) / 86400));
+  const texto = dias === 0 ? 'hoy' : dias === 1 ? 'hace 1 día' : 'hace ' + dias + ' días';
+  return { texto, dias };
+}
+
+// Embudo (alfabético) → etapa más avanzada primero → los que llevan más tiempo sin moverse primero
+function getLeadsCalificadosVista() {
+  let datos = leadsCalificadosDetalleData;
+  if (calificadosEmbudoFiltro) datos = datos.filter(l => l.embudo === calificadosEmbudoFiltro);
+  return [...datos].sort((a, b) =>
+    nombreEmbudo(a.embudo).localeCompare(nombreEmbudo(b.embudo), 'es') ||
+    ((b.etapa_orden || 0) - (a.etapa_orden || 0)) ||
+    ((a.actualizado || 0) - (b.actualizado || 0)));
+}
+
+function actualizarFiltroEmbudoCalificados() {
+  const embudos = [...new Set(leadsCalificadosDetalleData.map(l => l.embudo))].sort((a, b) => nombreEmbudo(a).localeCompare(nombreEmbudo(b), 'es'));
+  const sel = els.calificadosEmbudoFiltro;
+  const valorPrevio = sel.value;
+  sel.innerHTML = '<option value="">Todos los embudos</option>' + embudos.map(e => `<option value="${e}">${nombreEmbudo(e)}</option>`).join('');
+  sel.value = embudos.includes(valorPrevio) ? valorPrevio : '';
+  calificadosEmbudoFiltro = sel.value;
+}
+
+function renderLeadsCalificadosListado() {
+  const vista = getLeadsCalificadosVista();
+  const total = leadsCalificadosDetalleData.length;
+  els.calificadosListaTitulo.textContent = `Leads calientes (${total})`;
+
+  if (!total) {
+    els.calificadosListaTable.innerHTML = '<div class="empty">Sin leads calientes con estos filtros.</div>';
+    els.calificadosListaPaginacion.innerHTML = '';
+    return;
+  }
+  if (!vista.length) {
+    els.calificadosListaTable.innerHTML = '<div class="empty">Ningún lead caliente en ese embudo.</div>';
+    els.calificadosListaPaginacion.innerHTML = '';
+    return;
+  }
+
+  const totalPages = Math.max(1, Math.ceil(vista.length / CALIFICADOS_PAGE_SIZE));
+  if (calificadosListaPage > totalPages) calificadosListaPage = totalPages;
+  const startIdx = (calificadosListaPage - 1) * CALIFICADOS_PAGE_SIZE;
+  const pageItems = vista.slice(startIdx, startIdx + CALIFICADOS_PAGE_SIZE);
+
+  const rows = pageItems.map(l => {
+    const cuanto = haceCuanto(l.actualizado);
+    const viejo = cuanto.dias != null && cuanto.dias >= 7;
+    return `
+    <tr>
+      <td>${personConCorreoHtml(l.nombre, l.correo, l.lead_id)}</td>
+      <td>${embudoPillHtml(l.embudo)}</td>
+      <td>${l.etapa ? pillHtml(l.etapa) : '—'}</td>
+      <td>${l.responsible_user_id ? nombreAgente(l.responsible_user_id) : '—'}</td>
+      <td class="num"${viejo ? ' style="color:var(--c-loss)"' : ''}>${cuanto.texto}</td>
+    </tr>`;
+  }).join('');
+
+  els.calificadosListaTable.innerHTML = `
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Nombre</th><th>Embudo</th><th>Etapa</th><th>Asesor</th><th class="num">Última actualización</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    </div>`;
+
+  els.calificadosListaPaginacion.innerHTML = `
+    <div class="pager">
+      <span class="pager-info">Mostrando ${pageItems.length} de ${vista.length} leads${calificadosEmbudoFiltro ? ' (' + total + ' en total)' : ''}</span>
+      <div class="pager-controls">
+        <button type="button" class="pager-btn" id="calificadosListaPrev" ${calificadosListaPage <= 1 ? 'disabled' : ''} aria-label="Anterior">‹</button>
+        <span class="pager-page">${calificadosListaPage}</span>
+        <button type="button" class="pager-btn" id="calificadosListaNext" ${calificadosListaPage >= totalPages ? 'disabled' : ''} aria-label="Siguiente">›</button>
+      </div>
+    </div>`;
+
+  const prevBtn = document.getElementById('calificadosListaPrev');
+  const nextBtn = document.getElementById('calificadosListaNext');
+  if (prevBtn) prevBtn.addEventListener('click', () => { calificadosListaPage--; renderLeadsCalificadosListado(); });
+  if (nextBtn) nextBtn.addEventListener('click', () => { calificadosListaPage++; renderLeadsCalificadosListado(); });
+}
+
+function descargarCsvCalificados() {
+  if (!leadsCalificadosDetalleData.length) return;
+  const filas = [['Nombre', 'Correo', 'Embudo', 'Etapa', 'Asesor', 'Última actualización']];
+  getLeadsCalificadosVista().forEach(l => filas.push([
+    l.nombre, l.correo || '', nombreEmbudo(l.embudo), l.etapa || '',
+    l.responsible_user_id ? nombreAgente(l.responsible_user_id) : '',
+    l.actualizado ? new Date(l.actualizado * 1000).toISOString().slice(0, 10) : '',
+  ]));
+  const csv = filas.map(f => f.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `leads_calientes_${els.dateFrom.value || 'actual'}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function renderCrosstab(payload) {
+  actualizarBadgePeriodoCrosstab();
+  const embudos = Object.values(payload.por_embudo || {});
+  if (!embudos.length) {
+    els.crosstabStats.innerHTML = '';
+    els.crosstabTable.innerHTML = '<div class="empty">Sin resultados.</div>';
+    leadsCalificadosDetalleData = [];
+    calificadosListaPage = 1;
+    calificadosEmbudoFiltro = '';
+    actualizarFiltroEmbudoCalificados();
+    renderLeadsCalificadosListado();
+    return;
+  }
+
+  // Columnas = las etapas calientes (mismas en todos los embudos)
+  const etapas = (embudos[0].por_etapa || []).map(s => s.etapa);
+  const totalPorEtapa = etapas.map((nombre, i) => embudos.reduce((s, e) => s + ((e.por_etapa && e.por_etapa[i] && e.por_etapa[i].leads) || 0), 0));
+
+  els.crosstabStats.innerHTML = '<div class="stats-row">' +
+    statCard('target', 'var(--c-positive)', 'Leads calientes', fmtNum(payload.totales.leads_calificados)) +
+    etapas.map((nombre, i) => statCard('zap', 'var(--ink-soft)', nombre, fmtNum(totalPorEtapa[i]))).join('') +
+    (payload.totales.monto_calificado ? statCard('dollar', 'var(--ink-soft)', 'Monto', fmtMonto(payload.totales.monto_calificado)) : '') +
+    '</div>';
+
+  const rows = embudos.map(e => `<tr><td>${nombreEmbudo(e.embudo)}</td>` +
+    etapas.map((nombre, i) => `<td class="num">${fmtNum((e.por_etapa && e.por_etapa[i] && e.por_etapa[i].leads) || 0)}</td>`).join('') +
+    `<td class="num"><span class="numval">${fmtNum(e.leads_calificados)}</span></td></tr>`).join('');
+  els.crosstabTable.innerHTML = `
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Embudo</th>${etapas.map(n => `<th class="num">${n}</th>`).join('')}<th class="num">Total</th></tr></thead>
+      <tbody>${rows}
+        <tr class="totales"><td>Total</td>${totalPorEtapa.map(n => `<td class="num">${fmtNum(n)}</td>`).join('')}<td class="num"><span class="numval">${fmtNum(payload.totales.leads_calificados)}</span></td></tr>
+      </tbody>
+    </table>
+    </div>`;
+  const excluidos = payload.embudos_excluidos_sin_etapa_calificado || [];
+  els.crosstabExcluidos.textContent = excluidos.length ? `No incluidos (sin etapas calientes): ${excluidos.map(nombreEmbudo).join(', ')}` : '';
+
+  leadsCalificadosDetalleData = payload.leads_calificados_detalle || [];
+  calificadosListaPage = 1;
+  calificadosEmbudoFiltro = '';
+  actualizarFiltroEmbudoCalificados();
+  renderLeadsCalificadosListado();
+}
+
+/* ============================== RENDER: Inscritos del periodo ============================== */
+function renderGanados(payload) {
+  const embudos = Object.values(payload.por_embudo || {}).filter(e => e.ganado > 0);
+  renderGanadosDetalle(payload.ganados_detalle || []);
+  if (!embudos.length) { els.ganadosStats.innerHTML = ''; els.ganadosTable.innerHTML = '<div class="empty">Sin inscripciones cerradas en este periodo con estos filtros.</div>'; return; }
+  const totalInscritos = embudos.reduce((s, e) => s + e.ganado, 0);
+  const totalMonto = embudos.reduce((s, e) => s + e.monto_ganado, 0);
+  const ticketTotal = totalInscritos ? (totalMonto / totalInscritos) : 0;
+
+  els.ganadosStats.innerHTML = '<div class="stats-row">' +
+    statCard('checkCircle', 'var(--c-positive)', 'Inscritos', fmtNum(totalInscritos)) +
+    statCard('dollar', 'var(--ink-soft)', 'Monto total', fmtMonto(totalMonto), totalMonto ? '' : 'Aún no se captura el campo Venta en Kommo') +
+    statCard('barChart', 'var(--ink-soft)', 'Ticket promedio', fmtMonto(ticketTotal)) +
+    '</div>';
+
+  const rows = embudos.map(e => {
+    const ticket = e.ganado ? (e.monto_ganado / e.ganado) : 0;
+    return `
+    <tr>
+      <td>${nombreEmbudo(e.embudo)}</td>
+      <td class="num"><span class="numval">${fmtNum(e.ganado)}</span></td>
+      <td class="num"><span class="numval">${fmtMonto(e.monto_ganado)}</span></td>
+      <td class="num"><span class="numval">${fmtMonto(ticket)}</span></td>
+    </tr>`;
+  }).join('');
+  els.ganadosTable.innerHTML = `
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Embudo</th><th class="num">Inscritos</th><th class="num">Monto (MXN)</th><th class="num">Ticket promedio</th></tr></thead>
+      <tbody>${rows}
+        <tr class="totales">
+          <td>Total</td>
+          <td class="num"><span class="numval">${fmtNum(totalInscritos)}</span></td>
+          <td class="num"><span class="numval">${fmtMonto(totalMonto)}</span></td>
+          <td class="num"><span class="numval">${fmtMonto(ticketTotal)}</span></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>`;
+}
+
+let ganadosDetalleData = [];
+let ganadosEmbudoFiltro = '';
+
+function getGanadosDetalleVista() {
+  let datos = ganadosDetalleData;
+  if (ganadosEmbudoFiltro) datos = datos.filter(g => g.embudo === ganadosEmbudoFiltro);
+  return [...datos].sort((a, b) => nombreEmbudo(a.embudo || '').localeCompare(nombreEmbudo(b.embudo || ''), 'es') || (b.monto - a.monto));
+}
+
+function actualizarFiltroEmbudoGanados() {
+  const embudos = [...new Set(ganadosDetalleData.map(g => g.embudo).filter(Boolean))].sort((a, b) => nombreEmbudo(a).localeCompare(nombreEmbudo(b), 'es'));
+  const sel = els.ganadosEmbudoFiltro;
+  const valorPrevio = sel.value;
+  sel.innerHTML = '<option value="">Todos los embudos</option>' + embudos.map(e => `<option value="${e}">${nombreEmbudo(e)}</option>`).join('');
+  sel.value = embudos.includes(valorPrevio) ? valorPrevio : '';
+  ganadosEmbudoFiltro = sel.value;
+}
+
+function renderGanadosDetalle(detalle) {
+  ganadosDetalleData = detalle;
+  ganadosEmbudoFiltro = '';
+  actualizarFiltroEmbudoGanados();
+  renderGanadosDetalleTabla();
+}
+
+function renderGanadosDetalleTabla() {
+  if (!ganadosDetalleData.length) { els.ganadosDetalleTable.innerHTML = '<div class="empty">Sin inscripciones cerradas en este periodo con estos filtros.</div>'; return; }
+  const vista = getGanadosDetalleVista();
+  if (!vista.length) { els.ganadosDetalleTable.innerHTML = '<div class="empty">Ninguna inscripción en ese embudo.</div>'; return; }
+  const rows = vista.map(g => `
+    <tr>
+      <td>${leadLinkHtml(g.lead_id, g.nombre_lead)}</td>
+      <td>${g.nombre_contacto ? leadLinkHtml(g.lead_id, g.nombre_contacto) : '—'}</td>
+      <td>${g.embudo ? embudoPillHtml(g.embudo) : '—'}</td>
+      <td class="num"><span class="numval">${fmtMonto(g.monto)}</span></td>
+      <td><span class="person-cell">${avatarHtml(nombreAgente(g.responsible_user_id))}${nombreAgente(g.responsible_user_id)}</span></td>
+      <td>${g.canal || '—'}</td>
+      <td>${(g.etiquetas && g.etiquetas.length) ? g.etiquetas.join(', ') : '—'}</td>
+    </tr>`).join('');
+  els.ganadosDetalleTable.innerHTML = `
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Nombre lead</th><th>Contacto</th><th>Embudo</th><th class="num">Monto</th><th>Responsable</th><th>Canal</th><th>Etiquetas</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    </div>`;
+}
+
+/* ============================== RENDER: Inscritos vs periodo anterior y año anterior ============================== */
+// Ojo: new Date('2026-09-01') se interpreta como medianoche UTC, que en México
+// (UTC-6) cae el 31 de agosto a las 18:00 -- getDate() devolvería 31. Los
+// valores de los inputs de fecha se parsean a mano para que sean locales.
+function parseFechaLocal(str) {
+  const [y, m, d] = str.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+// Recorre una fecha N meses hacia atrás conservando el día. Si el mes destino
+// es más corto (31 de marzo restando un mes), se topa a su último día real;
+// sin ese tope, new Date(2026, 1, 31) se desbordaría al 3 de marzo.
+function restarMeses(fecha, meses) {
+  const y = fecha.getFullYear();
+  const m = fecha.getMonth() - meses;
+  const ultimoDiaDelMes = new Date(y, m + 1, 0).getDate();
+  return new Date(y, m, Math.min(fecha.getDate(), ultimoDiaDelMes));
+}
+
+async function fetchPeriodosPerformance(periodos, filterBy, filtros) {
+  const resultados = [];
+  for (const p of periodos) {
+    const respuesta = await callWebhook({
+      type: 'leads', view: 'performance',
+      date_from: p.date_from, date_to: p.date_to,
+      filter_by: filterBy,
+      pipeline_ids: filtros.pipelineIds, agent_ids: filtros.agentIds, tag_ids: filtros.tagIds,
+    });
+    resultados.push({ ...p, payload: extractPayload(respuesta, 'por_embudo') });
+  }
+  return resultados;
+}
+
+function renderBarChartMensual(container, datos, { valor, color, fmtValor }) {
+  const max = Math.max(1, ...datos.map(valor));
+  const w = 640, h = 260, padL = 8, padR = 8, padT = 30, padB = 40;
+  const chartW = w - padL - padR;
+  const chartH = h - padT - padB;
+  const gap = 18;
+  const barW = (chartW - gap * (datos.length - 1)) / datos.length;
+  const baseline = padT + chartH;
+
+  const bars = datos.map((d, i) => {
+    const v = valor(d);
+    const barH = (v / max) * chartH;
+    const x = padL + i * (barW + gap);
+    const y = baseline - barH;
+    const esMejor = v === max;
+    // El mes en curso va cortado al día de hoy: se dibuja punteado para que no
+    // se lea como un mes completo que simplemente vendió menos.
+    const trazoParcial = d.parcial ? ` stroke:${color}; stroke-width:1.5; stroke-dasharray:4 3;` : '';
+    return `
+      <g>
+        <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(barH, 1).toFixed(1)}" rx="6" style="fill:${color}; opacity:${d.parcial ? 0.35 : (esMejor ? 1 : 0.6)};${trazoParcial}"/>
+        <text x="${(x + barW / 2).toFixed(1)}" y="${(y - 8).toFixed(1)}" text-anchor="middle" style="font-family:var(--mono); font-size:11px; fill:var(--ink-soft)">${fmtValor(v)}</text>
+        <text x="${(x + barW / 2).toFixed(1)}" y="${(h - padB + 18).toFixed(1)}" text-anchor="middle" style="font-family:var(--display); font-size:12px; font-weight:600; fill:var(--ink)">${d.label}</text>
+      </g>`;
+  }).join('');
+
+  container.innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" style="width:100%; height:auto; max-width:640px; display:block; margin:6px auto 0;">
+      <line x1="${padL}" y1="${baseline}" x2="${w - padR}" y2="${baseline}" style="stroke:var(--border); stroke-width:1"/>
+      ${bars}
+    </svg>`;
+}
+
+function deltaHtml(actual, previo) {
+  if (previo == null) return '<span class="delta na">—</span>';
+  if (!previo) return actual ? '<span class="delta up">nuevo</span>' : '<span class="delta na">=</span>';
+  const cambio = ((actual - previo) / previo) * 100;
+  if (Math.abs(cambio) < 0.5) return '<span class="delta na">=</span>';
+  const signo = cambio > 0 ? '+' : '−';
+  return '<span class="delta ' + (cambio > 0 ? 'up' : 'down') + '">' + signo + Math.abs(Math.round(cambio)) + '%</span>';
+}
+
+function resumenInscritos(payload) {
+  const embudos = Object.values((payload && payload.por_embudo) || {});
+  return embudos.reduce((acc, e) => ({
+    inscritos: acc.inscritos + (e.ganado || 0),
+    monto: acc.monto + (e.monto_ganado || 0),
+    cerrados: acc.cerrados + (e.total || 0),
+  }), { inscritos: 0, monto: 0, cerrados: 0 });
+}
+
+async function cargarComparativoInscritos(filtros, desdeStr, hastaStr, closedActual) {
+  els.inscritosComparativo.innerHTML = '<div class="empty">Cargando comparativo…</div>';
+  try {
+    const desde = parseFechaLocal(desdeStr);
+    const hasta = parseFechaLocal(hastaStr);
+    const dias = Math.round((hasta - desde) / 86400000) + 1;
+    // Periodo anterior = el tramo inmediato anterior con la misma duración
+    const previoTo = new Date(desde.getFullYear(), desde.getMonth(), desde.getDate() - 1);
+    const previoFrom = new Date(previoTo.getFullYear(), previoTo.getMonth(), previoTo.getDate() - (dias - 1));
+    // Año anterior = las mismas fechas, 12 meses atrás
+    const anioFrom = restarMeses(desde, 12);
+    const anioTo = restarMeses(hasta, 12);
+    const periodos = [
+      { label: 'Año anterior', rango: `${fmtCorta(anioFrom)} – ${fmtCorta(anioTo)}`, date_from: fmt(anioFrom), date_to: fmt(anioTo) },
+      { label: 'Periodo anterior', rango: `${fmtCorta(previoFrom)} – ${fmtCorta(previoTo)}`, date_from: fmt(previoFrom), date_to: fmt(previoTo) },
+    ];
+    const resultados = await fetchPeriodosPerformance(periodos, 'enrolled_at', filtros);
+    const datos = [
+      ...resultados.map(r => ({ label: r.label, rango: r.rango, ...resumenInscritos(r.payload) })),
+      { label: 'Este periodo', rango: `${fmtCorta(desde)} – ${fmtCorta(hasta)}`, ...resumenInscritos(closedActual) },
+    ];
+    renderComparativoInscritos(datos);
+  } catch (err) {
+    els.inscritosComparativo.innerHTML = '<div class="empty">No se pudo cargar el comparativo: ' + err.message + '</div>';
+    console.error(err);
+  }
+}
+
+function fmtCorta(d) {
+  return d.getDate() + ' ' + d.toLocaleDateString('es-MX', { month: 'short' }).replace('.', '') + ' ' + String(d.getFullYear()).slice(2);
+}
+
+function renderComparativoInscritos(datos) {
+  const [anio, previo, actual] = datos;
+  const sinAnio = anio.inscritos === 0;
+  const nota = sinAnio
+    ? 'No hay inscripciones registradas en Kommo en ese periodo del año pasado; la comparación contra el año anterior se irá llenando con el tiempo.'
+    : '';
+
+  els.inscritosComparativo.innerHTML =
+    '<div class="stats-row">' +
+      statCard('checkCircle', 'var(--c-positive)', 'Inscritos · este periodo', fmtNum(actual.inscritos),
+        'vs ' + fmtNum(previo.inscritos) + ' en el periodo anterior') +
+      statCard('trendingUp', 'var(--c-neutral)', 'Cambio vs periodo anterior', deltaHtml(actual.inscritos, previo.inscritos),
+        previo.inscritos || actual.inscritos ? '' : 'Sin inscripciones en ambos') +
+      statCard('trendingUp', 'var(--c-neutral)', 'Cambio vs año anterior', sinAnio ? '<span class="delta na">—</span>' : deltaHtml(actual.inscritos, anio.inscritos),
+        sinAnio ? 'Sin datos del año pasado' : 'vs ' + fmtNum(anio.inscritos) + ' hace un año') +
+    '</div>' +
+    '<div id="inscritosComparativoChart"></div>' +
+    `<div class="table-scroll" style="margin-top:12px;"><table>
+      <thead><tr><th>Periodo</th><th>Fechas</th><th class="num">Inscritos</th><th class="num">Monto</th></tr></thead>
+      <tbody>${datos.map(d => `<tr><td>${d.label}</td><td>${d.rango}</td><td class="num"><span class="numval">${fmtNum(d.inscritos)}</span></td><td class="num"><span class="numval">${fmtMonto(d.monto)}</span></td></tr>`).join('')}</tbody>
+    </table></div>` +
+    (nota ? `<div class="help" style="margin-top:10px;">${nota}</div>` : '');
+
+  if (datos.every(d => !d.inscritos)) {
+    document.getElementById('inscritosComparativoChart').innerHTML = '<div class="empty">Sin inscripciones en estos tres periodos.</div>';
+    return;
+  }
+  renderBarChartMensual(document.getElementById('inscritosComparativoChart'), datos, { valor: d => d.inscritos, color: 'var(--c-positive)', fmtValor: v => fmtNum(v) });
+}
+
+/* ============================== RENDER: Actividad diaria por asesor ============================== */
+function nombreAgente(id) {
+  const found = agentsCatalog.find(a => String(a.id) === String(id));
+  return found ? found.name : `Usuario ${id}`;
+}
+
+function diasEntre(desdeStr, hastaStr) {
+  const out = [];
+  const d = parseFechaLocal(desdeStr);
+  const fin = parseFechaLocal(hastaStr);
+  let guard = 0;
+  while (d <= fin && guard < 400) { out.push(fmt(d)); d.setDate(d.getDate() + 1); guard++; }
+  return out;
+}
+
+function renderActividad(payload) {
+  const asesores = Object.values(payload.por_asesor || {});
+  const suma = (k) => asesores.reduce((s, a) => s + (a[k] || 0), 0);
+  const t = { wa: suma('wa'), notas: suma('notas'), tareas: suma('tareas'), citasProg: suma('citas_programadas'), citasCump: suma('citas_cumplidas'), total: suma('total') };
+  const activos = asesores.filter(a => a.total > 0 || a.citas_programadas > 0).length;
+
+  els.actividadStats.innerHTML = '<div class="stats-row">' +
+    statCard('users', 'var(--ink-soft)', 'Asesores con actividad', activos, 'de ' + asesores.length) +
+    statCard('zap', 'var(--c-positive)', 'WhatsApp enviados', fmtNum(t.wa)) +
+    statCard('layers', 'var(--ink-soft)', 'Notas', fmtNum(t.notas)) +
+    statCard('checkCircle', 'var(--ink-soft)', 'Tareas completadas', fmtNum(t.tareas)) +
+    statCard('target', 'var(--c-positive)', 'Citas programadas', fmtNum(t.citasProg), fmtNum(t.citasCump) + ' cumplidas') +
+    '</div>';
+
+  if (!asesores.length) {
+    els.actividadTable.innerHTML = '<div class="empty">Sin asesores para mostrar con estos filtros.</div>';
+    els.actividadDiaTable.innerHTML = '';
+    els.actividadNota.textContent = payload.nota_metodologica || '';
+    return;
+  }
+
+  const filas = [...asesores].sort((a, b) => (b.total - a.total) || (b.citas_programadas - a.citas_programadas));
+  els.actividadTable.innerHTML = `
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Asesor</th><th class="num">WhatsApp</th><th class="num">Notas</th><th class="num">Tareas completadas</th><th class="num">Citas programadas</th><th class="num">Citas cumplidas</th><th class="num">Total de actividades</th></tr></thead>
+      <tbody>${filas.map(a => `
+        <tr>
+          <td><span class="person-cell">${avatarHtml(a.nombre || nombreAgente(a.agent_id))}${a.nombre || nombreAgente(a.agent_id)}</span></td>
+          <td class="num">${fmtNum(a.wa)}</td><td class="num">${fmtNum(a.notas)}</td><td class="num">${fmtNum(a.tareas)}</td>
+          <td class="num">${fmtNum(a.citas_programadas)}</td><td class="num">${fmtNum(a.citas_cumplidas)}</td>
+          <td class="num"><span class="numval">${fmtNum(a.total)}</span></td>
+        </tr>`).join('')}
+        <tr class="totales">
+          <td>Total</td><td class="num">${fmtNum(t.wa)}</td><td class="num">${fmtNum(t.notas)}</td><td class="num">${fmtNum(t.tareas)}</td>
+          <td class="num">${fmtNum(t.citasProg)}</td><td class="num">${fmtNum(t.citasCump)}</td><td class="num"><span class="numval">${fmtNum(t.total)}</span></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>`;
+
+  // Por día: todos los días del rango (los que no tuvieron actividad salen en gris, para ver el ritmo)
+  const p = payload.periodo || { from: els.dateFrom.value, to: els.dateTo.value };
+  const porDia = Object.fromEntries((payload.por_dia || []).map(d => [d.fecha, d]));
+  const dias = diasEntre(p.from, p.to);
+  const max = Math.max(1, ...dias.map(f => { const d = porDia[f]; return d ? d.wa + d.notas + d.tareas : 0; }));
+  const filasDia = dias.map(f => {
+    const d = porDia[f] || { wa: 0, notas: 0, tareas: 0, citas: 0 };
+    const tot = d.wa + d.notas + d.tareas;
+    const fecha = parseFechaLocal(f).toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
+    return `<tr${tot || d.citas ? '' : ' style="color:var(--ink-faint)"'}>
+      <td>${fecha}</td>
+      <td class="num">${fmtNum(d.wa)}</td><td class="num">${fmtNum(d.notas)}</td><td class="num">${fmtNum(d.tareas)}</td><td class="num">${fmtNum(d.citas)}</td>
+      <td class="num"><span class="meta-progress"><span class="numval">${fmtNum(tot)}</span><span class="meta-progress-track"><span class="meta-progress-fill" style="width:${Math.round((tot / max) * 100)}%"></span></span></span></td>
+    </tr>`;
+  }).join('');
+  els.actividadDiaTable.innerHTML = `
+    <div class="table-scroll" style="max-height:420px; overflow-y:auto;">
+    <table>
+      <thead><tr><th>Día</th><th class="num">WhatsApp</th><th class="num">Notas</th><th class="num">Tareas</th><th class="num">Citas</th><th class="num">Total de actividades</th></tr></thead>
+      <tbody>${filasDia}</tbody>
+    </table>
+    </div>`;
+  els.actividadNota.textContent = payload.nota_metodologica || '';
+}
+
+/* ============================== RENDER: Atención a lo que delega la IA ============================== */
+function fmtHoras(seg) {
+  if (seg == null) return '—';
+  if (seg < 3600) return Math.max(1, Math.round(seg / 60)) + ' min';
+  return (seg / 3600).toFixed(1) + ' h';
+}
+
+function renderAtencion(payload) {
+  const asesores = Object.values(payload.por_asesor || {}).filter(a => a.delegados_ia > 0)
+    .sort((a, b) => (b.sin_atender - a.sin_atender) || (b.delegados_ia - a.delegados_ia));
+  const suma = (k) => asesores.reduce((s, a) => s + (a[k] || 0), 0);
+  const delegados = suma('delegados_ia');
+  const atendidos = suma('atendidos');
+  const sinAtender = suma('sin_atender');
+  const enPlazo = suma('en_plazo');
+  const umbral = payload.umbral_horas || 24;
+
+  if (!delegados) {
+    els.atencionStats.innerHTML = '';
+    els.atencionTable.innerHTML = '<div class="empty">La IA no delegó ningún lead a los asesores en este periodo con estos filtros.</div>';
+    els.atencionSinAtender.innerHTML = '';
+    els.atencionNota.textContent = payload.nota_metodologica || '';
+    return;
+  }
+
+  let seg = 0;
+  let n = 0;
+  asesores.forEach(a => { if (a.promedio_segundos_habiles != null) { seg += a.promedio_segundos_habiles * a.con_tiempo; n += a.con_tiempo; } });
+  const promedio = n ? Math.round(seg / n) : null;
+
+  els.atencionStats.innerHTML = '<div class="stats-row">' +
+    statCard('zap', 'var(--c-positive)', 'Delegados por la IA', fmtNum(delegados), fmtNum(enPlazo) + ' todavía dentro de las ' + umbral + ' h') +
+    statCard('checkCircle', 'var(--c-positive)', 'Atendidos por su asesor', fmtNum(atendidos), pctF(atendidos, delegados) + ' de los delegados') +
+    statCard('xCircle', 'var(--c-loss)', 'Sin atender', fmtNum(sinAtender), 'más de ' + umbral + ' h sin ninguna acción de su asesor') +
+    statCard('clock', 'var(--ink-soft)', 'Tiempo promedio de atención', fmtHoras(promedio), 'en horario laboral, solo los atendidos') +
+    '</div>';
+
+  const rows = asesores.map(a => `
+    <tr>
+      <td><span class="person-cell">${avatarHtml(a.nombre)}${a.nombre}</span></td>
+      <td class="num">${fmtNum(a.delegados_ia)}</td>
+      <td class="num"><span class="numval">${fmtNum(a.atendidos)}</span><span class="pct">${pctF(a.atendidos, a.delegados_ia)}</span></td>
+      <td class="num"${a.sin_atender ? ' style="color:var(--c-loss)"' : ''}><span class="numval">${fmtNum(a.sin_atender)}</span></td>
+      <td class="num">${fmtNum(a.en_plazo)}</td>
+      <td class="num">${fmtHoras(a.promedio_segundos_habiles)}</td>
+    </tr>`).join('');
+  els.atencionTable.innerHTML = `
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Asesor</th><th class="num">Delegados por la IA</th><th class="num">Atendidos</th><th class="num">Sin atender</th><th class="num">En plazo</th><th class="num">Tiempo promedio (horario laboral)</th></tr></thead>
+      <tbody>${rows}
+        <tr class="totales">
+          <td>Total</td><td class="num">${fmtNum(delegados)}</td>
+          <td class="num"><span class="numval">${fmtNum(atendidos)}</span><span class="pct">${pctF(atendidos, delegados)}</span></td>
+          <td class="num"><span class="numval">${fmtNum(sinAtender)}</span></td><td class="num">${fmtNum(enPlazo)}</td>
+          <td class="num">${fmtHoras(promedio)}</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>`;
+
+  const lista = payload.sin_atender || [];
+  if (!lista.length) {
+    els.atencionSinAtender.innerHTML = '<div class="empty">No hay leads delegados sin atender. 👍</div>';
+  } else {
+    const filas = lista.map(s => {
+      const cuanto = haceCuanto(s.entregado);
+      return `
+      <tr>
+        <td>${personConCorreoHtml(s.nombre, null, s.lead_id)}</td>
+        <td>${embudoPillHtml(s.embudo)}</td>
+        <td>${s.etapa ? pillHtml(s.etapa) : '—'}</td>
+        <td>${s.responsible_user_id ? nombreAgente(s.responsible_user_id) : '—'}</td>
+        <td class="num"${cuanto.dias != null && cuanto.dias >= 3 ? ' style="color:var(--c-loss)"' : ''}>${cuanto.texto}</td>
+        <td>${s.otra_persona ? 'Sí, otra persona' : 'No'}</td>
+      </tr>`;
+    }).join('');
+    const extra = payload.total_sin_atender > lista.length ? `<div class="help" style="margin-top:8px;">Se muestran los ${lista.length} más antiguos de ${payload.total_sin_atender}.</div>` : '';
+    els.atencionSinAtender.innerHTML = `
+      <div class="table-scroll" style="max-height:420px; overflow-y:auto;">
+      <table>
+        <thead><tr><th>Lead</th><th>Embudo</th><th>Etapa</th><th>Asesor</th><th class="num">Delegado</th><th>¿Lo atendió otra persona?</th></tr></thead>
+        <tbody>${filas}</tbody>
+      </table>
+      </div>${extra}`;
+  }
+  els.atencionNota.textContent = payload.nota_metodologica || '';
+}
+</script>
+</body>
+</html>
