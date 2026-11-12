@@ -1776,7 +1776,8 @@ function renderActividad(payload) {
 /* ============================== RENDER: Atención a lo que delega la IA ============================== */
 function fmtHoras(seg) {
   if (seg == null) return '—';
-  if (seg < 3600) return Math.max(1, Math.round(seg / 60)) + ' min';
+  if (seg < 60) return 'inmediato';
+  if (seg < 3600) return Math.round(seg / 60) + ' min';
   return (seg / 3600).toFixed(1) + ' h';
 }
 
