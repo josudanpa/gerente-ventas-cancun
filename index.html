@@ -120,6 +120,38 @@
   .stat-value { font-family: var(--display); font-size: 20px; font-weight: 700; color: var(--ink); line-height: 1.15; }
   .stat-sub { font-size: 11px; color: var(--ink-soft); margin-top: 1px; }
 
+  /* ---------- Recuadro grande: lo que recibe la IA ---------- */
+  .ia-callout {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--surface-2); border: 1px solid var(--border-soft); border-left: 4px solid var(--c-neutral);
+    border-radius: var(--radius-md); padding: 18px 20px; margin: 0 0 20px;
+  }
+  .ia-callout .stat-icon { width: 48px; height: 48px; border-radius: 12px; }
+  .ia-callout-title { font-family: var(--display); font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.35; }
+  .ia-callout-num { font-size: 26px; font-weight: 700; letter-spacing: -.01em; margin: 0 2px; }
+  .ia-callout-text { font-size: 13px; color: var(--ink-soft); line-height: 1.55; margin-top: 4px; max-width: 760px; }
+
+  /* ---------- Historial de cada lead «sin atender» ---------- */
+  .btn-hist {
+    background: var(--surface-2); color: var(--ink-soft); border: 1px solid var(--border);
+    padding: 4px 11px; font-size: 12px; font-weight: 500; border-radius: 999px; cursor: pointer; white-space: nowrap;
+  }
+  .btn-hist:hover { color: var(--ink); border-color: var(--ink-soft); }
+  tr.hist-row[hidden] { display: none; }
+  tr.hist-row > td { background: var(--surface-2); padding: 14px 18px; }
+  /* El historial se queda pegado a la izquierda y con ancho de pantalla aunque la tabla tenga scroll horizontal */
+  .hist-box { position: sticky; left: 0; width: min(760px, calc(100vw - 110px)); white-space: normal; }
+  .hist-resumen { font-size: 12.5px; color: var(--ink); margin: 0 0 10px; line-height: 1.5; max-width: 760px; }
+  .hist-lista { list-style: none; margin: 0; padding: 0 0 0 5px; border-left: 2px solid var(--border); }
+  .hist-lista li { position: relative; padding: 3px 0 3px 14px; font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; }
+  .hist-lista li::before { content: ''; position: absolute; left: -7px; top: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-faint); }
+  .hist-lista li.persona::before { background: var(--c-positive); }
+  .hist-lista li.entrega::before { background: var(--c-neutral); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-neutral) 25%, transparent); }
+  .hist-fecha { font-family: var(--mono); font-size: 11.5px; color: var(--ink-faint); margin-right: 8px; white-space: nowrap; }
+  .hist-quien { font-weight: 600; color: var(--ink); }
+  .hist-nota { color: var(--ink-faint); font-size: 11.5px; }
+  .hist-marca { color: var(--c-neutral); font-weight: 600; margin-left: 4px; }
+
   /* ---------- Form controls ---------- */
   label.field-label { font-size: 12.5px; color: var(--ink-soft); display: block; margin-bottom: 6px; font-weight: 500; }
   input[type="date"] {
@@ -270,6 +302,104 @@
     .top { align-items: flex-start; }
     button#btnGenerar { width: 100%; }
   }
+  /* ---------- Iteración del director (12-nov-2026): barra de periodo, filtros ocultos, pestañas y tableros ---------- */
+  :root { --c-warn: #b45309; --c-meta: #9a9ea7; }
+  .toolbar {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 12px 14px; margin-bottom: 14px;
+  }
+  .toolbar-periodo { display: flex; flex-direction: column; min-width: 0; flex: 1 1 220px; }
+  .toolbar-periodo .field-label { margin: 0; }
+  .toolbar-periodo strong { font-family: var(--display); font-size: 15px; font-weight: 600; color: var(--ink); }
+  .toolbar-acciones { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-sec {
+    display: inline-flex; align-items: center; gap: 6px; font: 600 13px var(--body); color: var(--ink);
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 9px 16px; cursor: pointer;
+  }
+  .btn-sec:hover { border-color: var(--ink-soft); }
+  .btn-sec[aria-expanded="true"] { background: var(--ink); color: var(--pill-ink); border-color: var(--ink); }
+  .filtros-panel { margin-bottom: 14px; }
+
+  .tabs {
+    display: flex; gap: 4px; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; margin: 0 0 16px;
+    border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 5; background: var(--bg); padding-top: 6px;
+  }
+  .tab {
+    flex: 0 0 auto; font: 600 13px var(--body); color: var(--ink-soft); background: none; border: none;
+    padding: 10px 14px 11px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+  .tab-pane[hidden] { display: none; }
+  .vacio-inicial { text-align: center; color: var(--ink-faint); font-size: 13.5px; padding: 46px 16px; border: 1px dashed var(--border); border-radius: var(--radius-lg); background: var(--surface); }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .table-scroll .person-cell { white-space: nowrap; }
+  .kpi {
+    text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 14px 16px; cursor: pointer; font: inherit; color: inherit; transition: border-color .15s, transform .15s;
+  }
+  .kpi:hover { border-color: var(--ink-soft); transform: translateY(-1px); }
+  .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-faint); font-weight: 600; }
+  .kpi-valor { font-family: var(--display); font-size: 30px; font-weight: 700; line-height: 1.1; margin-top: 4px; color: var(--ink); }
+  .kpi-sub { font-size: 12px; color: var(--ink-soft); margin-top: 3px; line-height: 1.4; }
+  .kpi-ir { font-size: 11.5px; color: var(--ink-faint); margin-top: 8px; }
+  .lectura { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  .lectura li { font-size: 13.5px; color: var(--ink); line-height: 1.5; padding-left: 20px; position: relative; }
+  .lectura li::before { content: ''; position: absolute; left: 4px; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-faint); }
+  .lectura li.bien::before { background: var(--c-positive); }
+  .lectura li.ojo::before { background: var(--c-warn); }
+  .lectura li.mal::before { background: var(--c-loss); }
+
+  .meta-hero { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; margin: 4px 0 20px; }
+  .meta-hero-num { font-family: var(--display); font-size: 44px; font-weight: 700; line-height: 1; color: var(--ink); }
+  .meta-hero-txt { font-size: 13px; color: var(--ink-soft); margin-top: 4px; }
+  .bullet { flex: 1 1 320px; min-width: 240px; }
+  .bullet-track { position: relative; height: 18px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--border-soft); overflow: hidden; }
+  .bullet-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px; background: var(--c-positive); }
+  .bullet-escala { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-top: 5px; }
+
+  .cap { display: flex; align-items: center; gap: 10px; min-width: 150px; }
+  .cap-track { position: relative; flex: 1; height: 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border-soft); overflow: hidden; }
+  .cap-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: var(--c-neutral); }
+  .cap-fill.ojo { background: var(--c-warn); }
+  .cap-fill.mal { background: var(--c-loss); }
+  .cap-txt { font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); white-space: nowrap; min-width: 64px; text-align: right; }
+  .estado { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--ink-soft); white-space: nowrap; }
+  .estado.ojo { color: var(--c-warn); border-color: color-mix(in srgb, var(--c-warn) 40%, var(--border)); }
+  .estado.mal { color: var(--c-loss); border-color: color-mix(in srgb, var(--c-loss) 40%, var(--border)); }
+  .estado.bien { color: var(--c-positive); border-color: color-mix(in srgb, var(--c-positive) 40%, var(--border)); }
+  .dos-col { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px; }
+  .dos-col > div { flex: 1; min-width: 260px; }
+  .subtit { font-family: var(--display); font-size: 13px; color: var(--ink-soft); font-weight: 600; margin: 22px 0 6px; }
+  .dos-col .subtit { margin-top: 0; }
+
+  .grafica { position: relative; width: 100%; margin-top: 6px; }
+  .grafica svg { display: block; width: 100%; overflow: visible; }
+  .grafica .eje { font: 11px var(--mono); fill: var(--ink-faint); }
+  .grafica .rejilla { stroke: var(--border-soft); stroke-width: 1; }
+  .grafica .base { stroke: var(--border); stroke-width: 1; }
+  .grafica .etq { font: 600 11px var(--body); fill: var(--ink-soft); }
+  .grafica .hit { fill: transparent; cursor: default; }
+  .grafica .hit:hover + .marca, .grafica .hit:hover { fill: color-mix(in srgb, var(--ink) 4%, transparent); }
+  .leyenda { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-soft); margin: 4px 0 2px; }
+  .leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+  .leyenda i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--ink-soft); }
+  .leyenda i.cuadro { width: 10px; height: 10px; border-radius: 3px; }
+  .tip {
+    position: fixed; z-index: 50; pointer-events: none; background: var(--ink); color: var(--pill-ink);
+    font-size: 12px; line-height: 1.45; padding: 7px 10px; border-radius: 8px; max-width: 260px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.18); opacity: 0; transition: opacity .08s;
+  }
+  .tip.visible { opacity: 1; }
+  .tip b { font-weight: 600; }
+  @media (max-width: 640px) {
+    .toolbar-acciones { width: 100%; }
+    .toolbar-acciones > button { flex: 1; }
+    .kpi-valor { font-size: 26px; }
+    .meta-hero-num { font-size: 36px; }
+  }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
   }
@@ -289,12 +419,23 @@
     <div class="status pending" id="status">Cargando catálogo…</div>
   </header>
 
-  <div class="panel">
+  <div class="toolbar">
+    <div class="toolbar-periodo">
+      <span class="field-label">Periodo</span>
+      <strong id="periodoTexto">—</strong>
+    </div>
+    <div class="toolbar-acciones">
+      <button type="button" class="btn-sec" id="btnFiltros" aria-expanded="false" aria-controls="filtrosPanel"><span id="iconFiltrosBtn"></span><span>Filtros</span></button>
+      <button id="btnGenerar">Generar reporte</button>
+    </div>
+  </div>
+
+  <div class="panel filtros-panel" id="filtrosPanel" hidden>
     <div class="panel-head">
       <div class="panel-icon" id="iconFiltros"></div>
       <h2>Filtros</h2>
     </div>
-    <p class="help">Elige el rango de fechas y los filtros que quieras (todos son opcionales) y pulsa «Generar reporte completo».</p>
+    <p class="help">Elige el rango de fechas y los filtros que quieras (todos son opcionales) y pulsa «Generar reporte» (arriba).</p>
 
     <div class="row">
       <div>
@@ -313,7 +454,7 @@
       <button type="button" data-preset="mesPasado">Mes pasado</button>
     </div>
     <p class="help" style="margin-top:10px;">
-      <b style="color:var(--ink-soft)">Leads que llegan a los asesores, desempeño, atención y canales</b> cuentan los leads que pasaron a una etapa Hot en ese rango (los delega la IA o los mueve el propio asesor). &nbsp;
+      <b style="color:var(--ink-soft)">Leads de campaña</b> cuenta los formularios que llegaron en ese rango; <b style="color:var(--ink-soft)">tiempos de respuesta</b>, los leads asignados en ese rango; <b style="color:var(--ink-soft)">leads vivos</b> es la foto de hoy (no depende de las fechas); <b style="color:var(--ink-soft)">dónde están en el embudo y canales</b>, los leads que pasaron a una etapa Hot en ese rango. &nbsp;
       <b style="color:var(--ink-soft)">Inscritos</b> cuenta las inscripciones registradas en ese rango, sin importar cuándo nació el lead.
     </p>
 
@@ -340,63 +481,161 @@
       <p class="help" style="margin-top:8px;">"Todas las que hay ahora" ignora las fechas de arriba — es la foto completa del embudo hoy. "Solo las creadas en ese periodo" la limita a leads que nacieron en el rango de fechas que pusiste arriba.</p>
     </div>
 
-    <div style="margin-top:20px;">
-      <button id="btnGenerar">Generar reporte completo</button>
-    </div>
   </div>
+
+
+  <div class="vacio-inicial" id="vacioInicial">Elige el periodo en «Filtros» (por omisión, el mes en curso) y pulsa «Generar reporte».</div>
 
   <div class="resultsRow" id="resultsRow" style="display:none;">
 
-    <!-- Tablero 1 · Leads recibidos por periodo -->
-    <div class="panel">
-      <div class="panel-head">
-        <div class="panel-icon" id="iconLeadsPeriodo"></div>
-        <h2>Leads que llegan a los asesores</h2>
-      </div>
-      <p class="help">Leads que pasaron a una etapa Hot en el periodo, ya sea porque la IA los delegó o porque el propio asesor los movió, vistos de dos formas — por asesor y por embudo. Las dos sumas tienen que coincidir: es la misma población de leads, nada más que el desglose es distinto.</p>
-      <div id="leadsPeriodoStats"></div>
-      <p class="help" id="iaResumen" style="margin-bottom:6px;"></p>
-      <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:14px;">
-        <div style="flex:1; min-width:260px;">
-          <h3 style="font-family:var(--display); font-size:12.5px; color:var(--ink-soft); font-weight:600; margin:0 0 8px; text-decoration:underline; text-underline-offset:3px;">Leads que llegan a cada asesor</h3>
-          <p class="help" style="margin-bottom:8px;">Cuántos leads Hot recibió cada asesor en el periodo (delegados por la IA o movidos por él mismo).</p>
-          <div id="leadsPorAsesorTable"></div>
-        </div>
-        <div style="flex:1; min-width:260px;">
-          <h3 style="font-family:var(--display); font-size:12.5px; color:var(--ink-soft); font-weight:600; margin:0 0 8px; text-decoration:underline; text-underline-offset:3px;">Leads que llegan por embudo</h3>
-          <p class="help" style="margin-bottom:8px;">Las metas mensuales por embudo están pendientes de definir; cuando se tengan, aquí se verá el avance de cada una.</p>
-          <div id="leadsPorEmbudoTable"></div>
-        </div>
-      </div>
-    </div>
+    <nav class="tabs" role="tablist" aria-label="Secciones del reporte">
+      <button type="button" class="tab" role="tab" data-tab="resumen" aria-selected="true">Resumen</button>
+      <button type="button" class="tab" role="tab" data-tab="prospectos" aria-selected="false">Reporte de prospectos</button>
+      <button type="button" class="tab" role="tab" data-tab="calidad" aria-selected="false">Calidad de la ejecución</button>
+      <button type="button" class="tab" role="tab" data-tab="embudo" aria-selected="false">Dónde están en el embudo</button>
+      <button type="button" class="tab" role="tab" data-tab="cierre" aria-selected="false">Cierre de ventas</button>
+      <button type="button" class="tab" role="tab" data-tab="tendencias" aria-selected="false">Tendencias gráficas</button>
+    </nav>
 
+    <!-- ===== Resumen ===== -->
+    <section class="tab-pane" data-pane="resumen" role="tabpanel">
+      <div class="kpis" id="resumenKpis"></div>
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-icon" id="iconResumen"></div>
+          <h2>Lectura rápida</h2>
+        </div>
+        <p class="help">Lo más importante del periodo en una línea por tablero. Toca cualquier recuadro de arriba para ver el detalle.</p>
+        <ul class="lectura" id="resumenLectura"></ul>
+      </div>
+    </section>
+
+    <!-- ===== Reporte de prospectos ===== -->
+    <section class="tab-pane" data-pane="prospectos" role="tabpanel" hidden>
+      <!-- Tablero 1 · Leads recibidos de campaña -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-icon" id="iconCampana"></div>
+          <h2>Leads recibidos de campaña</h2>
+        </div>
+        <p class="help">Leads que llegaron por los <b>formularios de Facebook</b> de la campaña en el periodo, contra la meta. No incluye lo que atiende la IA ni las bases de datos. Cuentan también los que todavía nadie acepta (siguen como lead entrante en Kommo).</p>
+        <div id="campanaMeta"></div>
+        <div id="campanaStats"></div>
+        <div class="dos-col">
+          <div>
+            <h3 class="subtit">Leads de campaña por asesor</h3>
+            <div id="campanaPorAsesor"></div>
+          </div>
+          <div>
+            <h3 class="subtit">Dónde están hoy</h3>
+            <div id="campanaPorEtapa"></div>
+          </div>
+        </div>
+        <div class="help" id="campanaNota" style="margin-top:12px;"></div>
+      </div>
+
+      <!-- Tablero 2 · Leads vivos en el embudo -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-icon" id="iconVivos"></div>
+          <h2>Leads vivos en el embudo</h2>
+          <span class="period-badge">Hoy</span>
+        </div>
+        <p class="help">Cuántos leads tiene hoy cada asesor en sus etapas (lo que ya le pasó y sigue abierto), contra su capacidad. Sirve para ver si alguien está saturado o si tiene muy pocos y debería darles más seguimiento. No depende de las fechas del periodo.</p>
+        <div id="vivosStats"></div>
+        <div id="vivosTable"></div>
+        <div class="help" id="vivosNota" style="margin-top:10px;"></div>
+      </div>
+
+      <!-- Lo de la IA, al final -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-icon" id="iconIA"></div>
+          <h2>Lo que recibe la IA</h2>
+        </div>
+        <div class="ia-callout" id="iaResumen"><div class="help" style="margin:0;">Cargando…</div></div>
+      </div>
+    </section>
+
+    <!-- ===== Calidad de la ejecución ===== -->
+    <section class="tab-pane" data-pane="calidad" role="tabpanel" hidden>
+      <!-- Tablero 3 · Tiempos de respuesta -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-icon" id="iconRespuesta"></div>
+          <h2>Tiempos de respuesta</h2>
+        </div>
+        <p class="help">Desde que un lead se <b>asigna</b> al asesor (no desde que se crea) hasta su primera acción: una <b>nota nueva</b>, un <b>mensaje saliente</b> o una <b>llamada saliente</b>, lo que ocurra primero. Mover la etapa o cambiar el responsable no cuenta. Solo se cuentan horas de lunes a viernes, de 9:00 a 18:00.</p>
+        <div id="tiemposStats"></div>
+        <div id="tiemposTable"></div>
+        <h3 class="subtit">Asignados sin atender</h3>
+        <p class="help" style="margin-bottom:12px;">Leads asignados hace más de 24 horas sin ninguna nota, mensaje o llamada de su asesor registrada en Kommo. Del más antiguo al más reciente. «Ver qué pasó» abre el historial del lead.</p>
+        <div id="tiemposSinAtender"></div>
+        <div class="help" id="tiemposNota" style="margin-top:10px;"></div>
+      </div>
+    <!-- Tablero 5 · Número de actividades -->
+    <div class="panel" id="actividadPanel">
+      <div class="panel-head">
+        <div class="panel-icon" id="iconActividad"></div>
+        <h2>Actividad diaria por asesor</h2>
+      </div>
+      <p class="help">Lo que cada asesor hizo en Kommo en el rango de fechas: mensajes de WhatsApp enviados, notas, tareas completadas y citas (tareas de tipo Reunión). Sin llamadas: Gestalt no tiene telefonía conectada a Kommo.</p>
+      <div id="actividadStats"></div>
+      <div id="actividadTable"></div>
+      <h3 style="font-family:var(--display); font-size:13px; color:var(--ink-soft); font-weight:600; margin:22px 0 4px; letter-spacing:-.005em;">Actividades por día</h3>
+      <div id="actividadDiaTable"></div>
+      <div class="help" id="actividadNota" style="margin-top:10px;"></div>
+      <details><summary>JSON crudo</summary><pre id="rawJsonActividad"></pre></details>
+    </div>
+    </section>
+
+    <!-- ===== Dónde están en el embudo ===== -->
+    <section class="tab-pane" data-pane="embudo" role="tabpanel" hidden>
     <!-- Tablero 2 · Desempeño del periodo -->
     <div class="panel">
       <div class="panel-head">
         <div class="panel-icon" id="iconDesempeno"></div>
         <h2>Desempeño del periodo</h2>
       </div>
-      <p class="help">De los leads que llegaron a los asesores en el periodo: cuántos llegaron a cita y a documentos, cuántos se inscribieron y cómo se perdieron los que se perdieron. Es la foto de dónde están hoy esos leads.</p>
+      <p class="help">De los leads que pasaron a una etapa Hot en el periodo (los delegó la IA o los movió el asesor): cuántos llegaron a cita y a documentos, cuántos se inscribieron y cómo se perdieron los que se perdieron. Es la foto de dónde están hoy esos leads.</p>
       <div id="resultsStats"></div>
       <div id="resultsTable"></div>
       <details><summary>JSON crudo</summary><pre id="rawJson"></pre></details>
     </div>
 
-    <!-- Atención a lo que delega la IA -->
-    <div class="panel">
-      <div class="panel-head">
-        <div class="panel-icon" id="iconTiempos"></div>
-        <h2>Atención a los leads que delega la IA</h2>
+    <!-- Tablero 4 · Oportunidades calientes -->
+    <div class="calif-row" style="flex-direction:column; flex-wrap:nowrap;">
+      <div class="panel" style="flex:none; width:100%;">
+        <div class="panel-head">
+          <div class="panel-icon" id="iconCalificados"></div>
+          <h2>Oportunidades calientes</h2>
+          <span class="period-badge" id="crosstabPeriodBadge"></span>
+        </div>
+        <p class="help">Quién está ahora mismo en una etapa caliente de cada embudo: Prospecto Hot, Citas Hot, Documentos Hot, Evaluación o Cierre Hot.</p>
+        <div id="crosstabStats"></div>
+        <div id="crosstabTable"></div>
+        <div class="help" id="crosstabExcluidos" style="margin-top:10px;"></div>
+        <details><summary>JSON crudo</summary><pre id="rawJsonCrosstab"></pre></details>
       </div>
-      <p class="help">Desde que la IA delega un lead a un asesor (lo pasa a una etapa Hot), cuánto tarda ese asesor en hacer algo con él: mandar un WhatsApp, escribir una nota, completar una tarea o mover la etapa. El tiempo cuenta solo horas de lunes a viernes, de 9:00 a 18:00. Los leads que el propio asesor mueve a Hot no entran aquí: ahí ya empezó él.</p>
-      <div id="atencionStats"></div>
-      <div id="atencionTable"></div>
-      <h3 style="font-family:var(--display); font-size:13px; color:var(--ink-soft); font-weight:600; margin:22px 0 4px; letter-spacing:-.005em;">Delegados sin atender</h3>
-      <p class="help" style="margin-bottom:12px;">Leads que la IA delegó hace más de 24 horas y que su asesor todavía no toca (ni mensaje, ni nota, ni tarea, ni cambio de etapa). Del más antiguo al más reciente.</p>
-      <div id="atencionSinAtender"></div>
-      <div class="help" id="atencionNota" style="margin-top:10px;"></div>
+      <div class="panel" style="flex:none; width:100%;">
+        <div class="panel-head">
+          <div class="panel-icon" id="iconLeadsCalifLista"></div>
+          <h2 id="calificadosListaTitulo">Leads calientes</h2>
+          <button type="button" id="btnExportarCalificados" class="export-btn"><span id="iconExportar"></span><span>Exportar</span></button>
+        </div>
+        <p class="help">Listado de leads en etapas calientes, de la etapa más avanzada a la menos avanzada y, dentro de cada una, de los que llevan más tiempo sin moverse a los más recientes.</p>
+        <div class="embudo-filter-row">
+          <label for="calificadosEmbudoFiltro">Embudo</label>
+          <select id="calificadosEmbudoFiltro"><option value="">Todos los embudos</option></select>
+        </div>
+        <div id="calificadosListaTable"></div>
+        <div id="calificadosListaPaginacion"></div>
+      </div>
     </div>
+    </section>
 
+    <!-- ===== Cierre de ventas ===== -->
+    <section class="tab-pane" data-pane="cierre" role="tabpanel" hidden>
     <!-- Tablero 3 · Inscritos del periodo -->
     <div class="panel">
       <div class="panel-head">
@@ -429,51 +668,28 @@
       <div id="canalesTable"></div>
       <details><summary>JSON crudo</summary><pre id="rawJsonCanales"></pre></details>
     </div>
+    </section>
 
-    <!-- Tablero 4 · Oportunidades calientes -->
-    <div class="calif-row" style="flex-direction:column; flex-wrap:nowrap;">
-      <div class="panel" style="flex:none; width:100%;">
+    <!-- ===== Tendencias gráficas ===== -->
+    <section class="tab-pane" data-pane="tendencias" role="tabpanel" hidden>
+      <div class="panel">
         <div class="panel-head">
-          <div class="panel-icon" id="iconCalificados"></div>
-          <h2>Oportunidades calientes</h2>
-          <span class="period-badge" id="crosstabPeriodBadge"></span>
+          <div class="panel-icon" id="iconTendencias"></div>
+          <h2>Tendencias gráficas</h2>
         </div>
-        <p class="help">Quién está ahora mismo en una etapa caliente de cada embudo: Prospecto Hot, Citas Hot, Documentos Hot, Evaluación o Cierre Hot.</p>
-        <div id="crosstabStats"></div>
-        <div id="crosstabTable"></div>
-        <div class="help" id="crosstabExcluidos" style="margin-top:10px;"></div>
-        <details><summary>JSON crudo</summary><pre id="rawJsonCrosstab"></pre></details>
+        <p class="help">Cómo se movieron los tableros día a día y semana a semana dentro del periodo elegido. Pasa el cursor sobre la gráfica para ver cada valor.</p>
+        <h3 class="subtit">Leads de campaña acumulados contra la meta</h3>
+        <div class="leyenda" id="leyendaAcumulado"></div>
+        <div class="grafica" id="graficaAcumulado"></div>
+        <h3 class="subtit">Leads de campaña por día</h3>
+        <div class="grafica" id="graficaDiaria"></div>
+        <h3 class="subtit">Tiempo de respuesta promedio por semana (horas hábiles)</h3>
+        <div class="grafica" id="graficaRespuesta"></div>
+        <h3 class="subtit">Asignados y atendidos por semana</h3>
+        <div class="leyenda" id="leyendaAsignados"></div>
+        <div class="grafica" id="graficaAsignados"></div>
       </div>
-      <div class="panel" style="flex:none; width:100%;">
-        <div class="panel-head">
-          <div class="panel-icon" id="iconLeadsCalifLista"></div>
-          <h2 id="calificadosListaTitulo">Leads calientes</h2>
-          <button type="button" id="btnExportarCalificados" class="export-btn"><span id="iconExportar"></span><span>Exportar</span></button>
-        </div>
-        <p class="help">Listado de leads en etapas calientes, de la etapa más avanzada a la menos avanzada y, dentro de cada una, de los que llevan más tiempo sin moverse a los más recientes.</p>
-        <div class="embudo-filter-row">
-          <label for="calificadosEmbudoFiltro">Embudo</label>
-          <select id="calificadosEmbudoFiltro"><option value="">Todos los embudos</option></select>
-        </div>
-        <div id="calificadosListaTable"></div>
-        <div id="calificadosListaPaginacion"></div>
-      </div>
-    </div>
-
-    <!-- Tablero 5 · Número de actividades -->
-    <div class="panel" id="actividadPanel">
-      <div class="panel-head">
-        <div class="panel-icon" id="iconActividad"></div>
-        <h2>Actividad diaria por asesor</h2>
-      </div>
-      <p class="help">Lo que cada asesor hizo en Kommo en el rango de fechas: mensajes de WhatsApp enviados, notas, tareas completadas y citas (tareas de tipo Reunión). Sin llamadas: Gestalt no tiene telefonía conectada a Kommo.</p>
-      <div id="actividadStats"></div>
-      <div id="actividadTable"></div>
-      <h3 style="font-family:var(--display); font-size:13px; color:var(--ink-soft); font-weight:600; margin:22px 0 4px; letter-spacing:-.005em;">Actividades por día</h3>
-      <div id="actividadDiaTable"></div>
-      <div class="help" id="actividadNota" style="margin-top:10px;"></div>
-      <details><summary>JSON crudo</summary><pre id="rawJsonActividad"></pre></details>
-    </div>
+    </section>
   </div>
 
 
@@ -774,7 +990,7 @@ els.btnGenerar.addEventListener('click', async () => {
 
   els.btnGenerar.disabled = true;
   els.resultsRow.style.display = 'none';
-  setStatus('Generando el reporte: lo que llega a los asesores, atención, inscritos y oportunidades calientes…', 'pending');
+  setStatus('Generando el reporte: campaña, leads vivos y tiempos de respuesta…', 'pending');
 
   try {
     const filtros = { pipelineIds, agentIds, tagIds };
@@ -782,32 +998,51 @@ els.btnGenerar.addEventListener('click', async () => {
     const crossBody = { ...base, view: 'qualified_crosstab' };
     if (!useSnapshot) { crossBody.date_from = desde; crossBody.date_to = hasta; }
 
-    // Bloque 1: lo que llega a los asesores (la IA lo delega a una etapa Hot o el propio asesor lo mueve), inscritos (por fecha de inscripción) y oportunidades calientes
-    const [advData, closedData, crossData] = await Promise.all([
-      callWebhook({ ...base, view: 'advisors', date_from: desde, date_to: hasta }, 'inicial'),
+    // Bloque 1: los tres tableros del director (campaña, leads vivos, tiempos de respuesta) + inscritos del periodo
+    const [tabRaw, closedData] = await Promise.all([
+      callWebhook({ ...base, view: 'tableros', date_from: desde, date_to: hasta }, 'inicial'),
       callWebhook({ ...base, view: 'performance', date_from: desde, date_to: hasta, filter_by: 'enrolled_at' }, 'inicial'),
-      callWebhook(crossBody, 'inicial'),
     ]);
-    const advPayload = extractPayload(advData, 'por_asesor');
+    tabData = extractPayload(tabRaw, 'campana');
     const closedPayload = extractPayload(closedData, 'por_embudo');
-    const crossPayload = extractPayload(crossData, 'totales');
-
-    renderLeadsPorPeriodo(advPayload);
-    renderResultados(advPayload);
-    renderAtencion(advPayload);
+    renderCampana(tabData);
+    renderVivos(tabData);
+    renderTiempos(tabData);
     renderGanados(closedPayload);
-    renderCanales(advPayload, closedPayload);
-    renderCrosstab(crossPayload);
-    els.rawJson.textContent = JSON.stringify(advData, null, 2);
-    els.rawJsonCanales.textContent = JSON.stringify({ llegaron_a_asesores: advPayload.por_canal, inscritos_del_periodo: closedPayload.por_canal }, null, 2);
-    els.rawJsonCrosstab.textContent = JSON.stringify(crossData, null, 2);
+    renderResumen(tabData, closedPayload);
+    document.getElementById('vacioInicial').hidden = true;
     els.resultsRow.style.display = 'block';
+    dibujarTendencias();
+    setStatus('Tableros listos. Cargando embudo, oportunidades calientes, canales y actividad…', 'pending');
+
+    // Bloque 2: dónde están en el embudo (lo que pasó a Hot), oportunidades calientes, canales y lo que recibe la IA
+    try {
+      const [advData, crossData] = await Promise.all([
+        callWebhook({ ...base, view: 'advisors', date_from: desde, date_to: hasta }, 'inicial'),
+        callWebhook(crossBody, 'inicial'),
+      ]);
+      const advPayload = extractPayload(advData, 'por_asesor');
+      const crossPayload = extractPayload(crossData, 'totales');
+      renderResultados(advPayload);
+      renderCanales(advPayload, closedPayload);
+      renderCrosstab(crossPayload);
+      renderIA(advPayload);
+      els.rawJson.textContent = JSON.stringify(advData, null, 2);
+      els.rawJsonCanales.textContent = JSON.stringify({ llegaron_a_asesores: advPayload.por_canal, inscritos_del_periodo: closedPayload.por_canal }, null, 2);
+      els.rawJsonCrosstab.textContent = JSON.stringify(crossData, null, 2);
+    } catch (err) {
+      const msg = '<div class="empty">No se pudo cargar: ' + escH(err.message) + '</div>';
+      els.resultsTable.innerHTML = msg;
+      els.crosstabTable.innerHTML = msg;
+      els.canalesTable.innerHTML = msg;
+      document.getElementById('iaResumen').innerHTML = msg;
+      console.error(err);
+    }
     els.actividadStats.innerHTML = '';
     els.actividadTable.innerHTML = '<div class="empty">Cargando actividad…</div>';
     els.actividadDiaTable.innerHTML = '';
-    setStatus('Leads, desempeño, atención e inscritos listos. Cargando actividad y comparativos…', 'pending');
 
-    // Bloque 2: actividad por asesor (si falla, no tira el resto)
+    // Bloque 3: actividad por asesor (si falla, no tira el resto)
     try {
       const actData = await callWebhook({ type: 'leads', view: 'activities', date_from: desde, date_to: hasta, agent_ids: agentIds }, 'inicial');
       renderActividad(extractPayload(actData, 'por_asesor'));
@@ -819,12 +1054,11 @@ els.btnGenerar.addEventListener('click', async () => {
       console.error(err);
     }
 
-    // Bloque 3: inscritos contra el periodo anterior y contra el año anterior
+    // Bloque 4: inscritos contra el periodo anterior y contra el año anterior
     await cargarComparativoInscritos(filtros, desde, hasta, closedPayload);
 
-    const totalLlegaron = Object.values(advPayload.por_embudo || {}).reduce((s, e) => s + e.llegaron, 0);
     const totalInscritos = Object.values(closedPayload.por_embudo || {}).reduce((s, e) => s + e.ganado, 0);
-    setStatus(`Listo · ${fmtNum(totalLlegaron)} leads llegaron a asesores · ${fmtNum(totalInscritos)} inscritos · ${fmtNum(crossPayload.totales.leads_calificados)} oportunidades calientes`, 'ok');
+    setStatus(`Listo · ${fmtNum(tabData.campana.total)} leads de campaña · ${fmtNum(tabData.vivos.total)} leads vivos · ${fmtNum(totalInscritos)} inscritos`, 'ok');
   } catch (err) {
     setStatus('No se pudo generar el reporte: ' + err.message, 'err');
     console.error(err);
@@ -925,9 +1159,13 @@ function renderLeadsPorPeriodo(payload) {
       : '') +
     '</div>';
 
-  // Lo de la IA, en una sola línea: no se audita a la IA, solo se dice cuánto recibió y cuánto pasó a los asesores.
-  els.iaResumen.innerHTML = '<b style="color:var(--ink-soft)">La IA recibió ' + fmtNum(ia.leads_nuevos) + ' leads nuevos en el periodo</b> y los atiende primero. ' +
-    'A los asesores solo les llega lo que pasa a una etapa Hot; lo demás (bases importadas, leads fríos) se queda con la IA y no cuenta en las métricas de los asesores.';
+  // Lo de la IA: no se audita a la IA; un recuadro grande dice cuánto recibió y qué cuenta para los asesores.
+  els.iaResumen.innerHTML =
+    '<div class="stat-icon" style="--stat-color:var(--c-neutral)">' + icon('barChart', 'var(--c-neutral)', 24) + '</div>' +
+    '<div class="ia-callout-body">' +
+      '<div class="ia-callout-title">La IA recibió <span class="ia-callout-num">' + fmtNum(ia.leads_nuevos) + '</span> leads nuevos en el periodo y los atiende primero.</div>' +
+      '<div class="ia-callout-text">A los asesores solo les llega lo que pasa a una etapa Hot; lo demás (bases importadas, leads fríos) se queda con la IA y no cuenta en las métricas de los asesores.</div>' +
+    '</div>';
 
   els.leadsPorAsesorTable.innerHTML = miniTabla(filasAsesor, 'Asesor');
   els.leadsPorEmbudoTable.innerHTML = tablaLeadsPorEmbudo(filasEmbudo);
@@ -936,7 +1174,7 @@ function renderLeadsPorPeriodo(payload) {
 /* ============================== RENDER: Desempeño ============================== */
 function renderResultados(payload) {
   const embudos = Object.values(payload.por_embudo || {}).filter(e => e.llegaron > 0);
-  if (!embudos.length) { els.resultsStats.innerHTML = ''; els.resultsTable.innerHTML = '<div class="empty">Ningún lead llegó a los asesores en este periodo con estos filtros.</div>'; return; }
+  if (!embudos.length) { els.resultsStats.innerHTML = ''; els.resultsTable.innerHTML = '<div class="empty">Ningún lead pasó a una etapa Hot en este periodo con estos filtros.</div>'; return; }
   const t = embudos.reduce((acc, e) => {
     acc.llegaron += e.llegaron; acc.cita += e.cita; acc.docs += e.docs;
     acc.ganado += e.ganado; acc.perdido += e.perdido; acc.monto_ganado += e.monto_ganado;
@@ -944,10 +1182,10 @@ function renderResultados(payload) {
   }, { llegaron: 0, cita: 0, docs: 0, ganado: 0, perdido: 0, monto_ganado: 0 });
 
   els.resultsStats.innerHTML = '<div class="stats-row">' +
-    statCard('layers', 'var(--ink-soft)', 'Llegaron a los asesores', fmtNum(t.llegaron)) +
-    statCard('target', 'var(--c-positive)', 'Cita al plantel', fmtNum(t.cita), pctF(t.cita, t.llegaron) + ' de los que llegaron') +
-    statCard('checkCircle', 'var(--c-positive)', 'Documentos', fmtNum(t.docs), pctF(t.docs, t.llegaron) + ' de los que llegaron') +
-    statCard('checkCircle', 'var(--c-positive)', 'Inscripción', fmtNum(t.ganado), pctF(t.ganado, t.llegaron) + ' de los que llegaron') +
+    statCard('layers', 'var(--ink-soft)', 'Pasaron a Hot', fmtNum(t.llegaron)) +
+    statCard('target', 'var(--c-positive)', 'Cita al plantel', fmtNum(t.cita), pctF(t.cita, t.llegaron) + ' de los que pasaron a Hot') +
+    statCard('checkCircle', 'var(--c-positive)', 'Documentos', fmtNum(t.docs), pctF(t.docs, t.llegaron) + ' de los que pasaron a Hot') +
+    statCard('checkCircle', 'var(--c-positive)', 'Inscripción', fmtNum(t.ganado), pctF(t.ganado, t.llegaron) + ' de los que pasaron a Hot') +
     statCard('xCircle', 'var(--c-loss)', 'Perdidos', fmtNum(t.perdido)) +
     '</div>';
 
@@ -1542,6 +1780,44 @@ function fmtHoras(seg) {
   return (seg / 3600).toFixed(1) + ' h';
 }
 
+const MESES_CORTOS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+function escH(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+// Hora en la zona de la sede: el flujo manda `zona_horas` (diferencia con UTC, p. ej. -5 o -6)
+function fmtHoraSede(ts, zonaHoras) {
+  const d = new Date((ts + (zonaHoras == null ? -6 : zonaHoras) * 3600) * 1000);
+  return d.getUTCDate() + ' ' + MESES_CORTOS[d.getUTCMonth()] + ' ' + String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0');
+}
+// Qué le pasó a un lead «sin atender» y quién lo hizo (sin usuario = la IA o una automatización)
+function historialLeadHtml(s, zona) {
+  const ev = s.historial || [];
+  if (!ev.length) return '<div class="help" style="margin:0;">No se encontró historial de este lead en Kommo.</div>';
+  const quien = (e) => e.persona
+    ? '<span class="hist-quien">' + escH(e.por) + '</span>'
+    : '<span class="hist-quien">La IA o el sistema</span> <span class="hist-nota">(sin usuario)</span>';
+  const items = ev.map(e => {
+    let txt;
+    if (e.tipo === 'lead_added') txt = quien(e) + ' creó el lead';
+    else if (e.tipo === 'lead_status_changed') txt = quien(e) + ' lo movió de <b>' + escH(e.de || '?') + '</b> a <b>' + escH(e.a || '?') + '</b>';
+    else if (e.tipo === 'common_note_added') txt = quien(e) + ' escribió una nota';
+    else if (e.tipo === 'task_completed') txt = quien(e) + ' completó una tarea';
+    else if (e.tipo === 'entity_responsible_changed') txt = quien(e) + ' cambió el responsable de <b>' + escH(e.de || '?') + '</b> a <b>' + escH(e.a || '?') + '</b>';
+    else txt = quien(e) + ' · ' + escH(e.tipo);
+    const entrega = e.tipo === 'lead_status_changed' && e.ts === s.entregado;
+    return '<li class="' + (e.persona ? 'persona' : '') + (entrega ? ' entrega' : '') + '"><span class="hist-fecha">' + fmtHoraSede(e.ts, zona) + '</span>' + txt +
+      (entrega ? ' <span class="hist-marca">← aquí la IA se lo delegó a su asesor</span>' : '') + '</li>';
+  }).join('');
+  const despues = ev.filter(e => e.ts > s.entregado);
+  const deGente = despues.filter(e => e.persona);
+  const plural = despues.length === 1 ? '' : 's';
+  const resumen = 'La IA se lo delegó a su asesor el ' + fmtHoraSede(s.entregado, zona) + '. ' + (despues.length
+    ? 'Desde entonces hay ' + despues.length + ' movimiento' + plural + ' registrado' + plural + ': ' + (deGente.length
+      ? deGente.length + ' de una persona (' + [...new Set(deGente.map(e => e.por))].map(escH).join(', ') + ') y ' + (despues.length - deGente.length) + ' del sistema.'
+      : 'todos del sistema o la IA, ninguno de una persona.')
+    : 'Desde entonces no hay ningún movimiento registrado.');
+  const omit = s.historial_omitidos > 0 ? '<div class="help" style="margin:8px 0 0;">Se muestran los últimos ' + ev.length + ' movimientos; hay ' + s.historial_omitidos + ' más antiguos.</div>' : '';
+  return '<p class="hist-resumen">' + resumen + '</p><ul class="hist-lista">' + items + '</ul>' + omit;
+}
+
 function renderAtencion(payload) {
   const asesores = Object.values(payload.por_asesor || {}).filter(a => a.delegados_ia > 0)
     .sort((a, b) => (b.sin_atender - a.sin_atender) || (b.delegados_ia - a.delegados_ia));
@@ -1550,6 +1826,7 @@ function renderAtencion(payload) {
   const atendidos = suma('atendidos');
   const sinAtender = suma('sin_atender');
   const enPlazo = suma('en_plazo');
+  const fueraHot = suma('fuera_de_hot');
   const umbral = payload.umbral_horas || 24;
 
   if (!delegados) {
@@ -1568,7 +1845,8 @@ function renderAtencion(payload) {
   els.atencionStats.innerHTML = '<div class="stats-row">' +
     statCard('zap', 'var(--c-positive)', 'Delegados por la IA', fmtNum(delegados), fmtNum(enPlazo) + ' todavía dentro de las ' + umbral + ' h') +
     statCard('checkCircle', 'var(--c-positive)', 'Atendidos por su asesor', fmtNum(atendidos), pctF(atendidos, delegados) + ' de los delegados') +
-    statCard('xCircle', 'var(--c-loss)', 'Sin atender', fmtNum(sinAtender), 'más de ' + umbral + ' h sin ninguna acción de su asesor') +
+    statCard('xCircle', 'var(--c-loss)', 'Sin atender', fmtNum(sinAtender), 'siguen en Hot y más de ' + umbral + ' h sin ninguna acción de su asesor') +
+    statCard('layers', 'var(--ink-soft)', 'Ya no están en Hot', fmtNum(fueraHot), 'la IA los regresó a frío o perdido sin que su asesor los tocara') +
     statCard('clock', 'var(--ink-soft)', 'Tiempo promedio de atención', fmtHoras(promedio), 'en horario laboral, solo los atendidos') +
     '</div>';
 
@@ -1579,17 +1857,19 @@ function renderAtencion(payload) {
       <td class="num"><span class="numval">${fmtNum(a.atendidos)}</span><span class="pct">${pctF(a.atendidos, a.delegados_ia)}</span></td>
       <td class="num"${a.sin_atender ? ' style="color:var(--c-loss)"' : ''}><span class="numval">${fmtNum(a.sin_atender)}</span></td>
       <td class="num">${fmtNum(a.en_plazo)}</td>
+      <td class="num">${fmtNum(a.fuera_de_hot)}</td>
       <td class="num">${fmtHoras(a.promedio_segundos_habiles)}</td>
     </tr>`).join('');
   els.atencionTable.innerHTML = `
     <div class="table-scroll">
     <table>
-      <thead><tr><th>Asesor</th><th class="num">Delegados por la IA</th><th class="num">Atendidos</th><th class="num">Sin atender</th><th class="num">En plazo</th><th class="num">Tiempo promedio (horario laboral)</th></tr></thead>
+      <thead><tr><th>Asesor</th><th class="num">Delegados por la IA</th><th class="num">Atendidos</th><th class="num">Sin atender</th><th class="num">En plazo</th><th class="num">Ya no están en Hot</th><th class="num">Tiempo promedio (horario laboral)</th></tr></thead>
       <tbody>${rows}
         <tr class="totales">
           <td>Total</td><td class="num">${fmtNum(delegados)}</td>
           <td class="num"><span class="numval">${fmtNum(atendidos)}</span><span class="pct">${pctF(atendidos, delegados)}</span></td>
           <td class="num"><span class="numval">${fmtNum(sinAtender)}</span></td><td class="num">${fmtNum(enPlazo)}</td>
+          <td class="num">${fmtNum(fueraHot)}</td>
           <td class="num">${fmtHoras(promedio)}</td>
         </tr>
       </tbody>
@@ -1600,7 +1880,8 @@ function renderAtencion(payload) {
   if (!lista.length) {
     els.atencionSinAtender.innerHTML = '<div class="empty">No hay leads delegados sin atender. 👍</div>';
   } else {
-    const filas = lista.map(s => {
+    const zona = payload.zona_horas;
+    const filas = lista.map((s, i) => {
       const cuanto = haceCuanto(s.entregado);
       return `
       <tr>
@@ -1610,19 +1891,450 @@ function renderAtencion(payload) {
         <td>${s.responsible_user_id ? nombreAgente(s.responsible_user_id) : '—'}</td>
         <td class="num"${cuanto.dias != null && cuanto.dias >= 3 ? ' style="color:var(--c-loss)"' : ''}>${cuanto.texto}</td>
         <td>${s.otra_persona ? 'Sí, otra persona' : 'No'}</td>
-      </tr>`;
+        <td><button type="button" class="btn-hist" data-hist="${i}">Ver qué pasó</button></td>
+      </tr>
+      <tr class="hist-row" id="hist-${i}" hidden><td colspan="7"><div class="hist-box">${historialLeadHtml(s, zona)}</div></td></tr>`;
     }).join('');
     const extra = payload.total_sin_atender > lista.length ? `<div class="help" style="margin-top:8px;">Se muestran los ${lista.length} más antiguos de ${payload.total_sin_atender}.</div>` : '';
     els.atencionSinAtender.innerHTML = `
-      <div class="table-scroll" style="max-height:420px; overflow-y:auto;">
+      <div class="table-scroll" style="max-height:560px; overflow-y:auto;">
       <table>
-        <thead><tr><th>Lead</th><th>Embudo</th><th>Etapa</th><th>Asesor</th><th class="num">Delegado</th><th>¿Lo atendió otra persona?</th></tr></thead>
+        <thead><tr><th>Lead</th><th>Embudo</th><th>Etapa</th><th>Asesor</th><th class="num">Delegado</th><th>¿Lo atendió otra persona?</th><th>Historial</th></tr></thead>
         <tbody>${filas}</tbody>
       </table>
       </div>${extra}`;
+    els.atencionSinAtender.onclick = (ev) => {
+      const b = ev.target.closest && ev.target.closest('.btn-hist');
+      if (!b) return;
+      const fila = document.getElementById('hist-' + b.dataset.hist);
+      if (!fila) return;
+      fila.hidden = !fila.hidden;
+      b.textContent = fila.hidden ? 'Ver qué pasó' : 'Ocultar';
+    };
   }
   els.atencionNota.textContent = payload.nota_metodologica || '';
 }
+/* ============================== Iteración del director (12-nov-2026) ==============================
+   Filtros ocultos, pestañas y los tres tableros: campaña vs meta, leads vivos vs tope, tiempos de respuesta
+   desde la asignación. Los datos salen de la vista `tableros` del flujo de n8n. */
+paintIcon('iconResumen', 'layers', 'var(--ink-soft)');
+paintIcon('iconCampana', 'target', 'var(--c-positive)');
+paintIcon('iconVivos', 'users', 'var(--ink-soft)');
+paintIcon('iconRespuesta', 'clock', 'var(--ink-soft)');
+paintIcon('iconTendencias', 'trendingUp', 'var(--ink-soft)');
+paintIcon('iconIA', 'barChart', 'var(--c-neutral)');
+document.getElementById('iconFiltrosBtn').innerHTML = icon('sliders', 'currentColor', 15);
+
+let tabData = null;
+
+// ---------- Filtros ocultos y texto del periodo ----------
+const btnFiltros = document.getElementById('btnFiltros');
+const filtrosPanel = document.getElementById('filtrosPanel');
+btnFiltros.addEventListener('click', () => {
+  const abrir = filtrosPanel.hidden;
+  filtrosPanel.hidden = !abrir;
+  btnFiltros.setAttribute('aria-expanded', String(abrir));
+});
+function fechaLarga(str) {
+  const p = String(str || '').split('-').map(Number);
+  return p.length === 3 ? p[2] + ' ' + MESES_CORTOS[p[1] - 1] + ' ' + p[0] : '—';
+}
+function actualizarPeriodoTexto() {
+  const a = els.dateFrom.value, b = els.dateTo.value;
+  document.getElementById('periodoTexto').textContent = (a && b) ? (a === b ? fechaLarga(a) : fechaLarga(a) + ' – ' + fechaLarga(b)) : 'Elige un periodo en Filtros';
+}
+els.dateFrom.addEventListener('change', actualizarPeriodoTexto);
+els.dateTo.addEventListener('change', actualizarPeriodoTexto);
+document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', actualizarPeriodoTexto));
+actualizarPeriodoTexto();
+
+// ---------- Pestañas ----------
+const TABS = [...document.querySelectorAll('.tab')];
+function mostrarTab(nombre) {
+  TABS.forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === nombre)));
+  document.querySelectorAll('.tab-pane').forEach(p => { p.hidden = p.dataset.pane !== nombre; });
+  try { localStorage.setItem('gerente_tab', nombre); } catch (e) { /* sin almacenamiento: no pasa nada */ }
+  if (nombre === 'tendencias') dibujarTendencias();
+}
+TABS.forEach((t, i) => {
+  t.addEventListener('click', () => mostrarTab(t.dataset.tab));
+  t.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const sig = TABS[(i + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length];
+    sig.focus(); mostrarTab(sig.dataset.tab);
+  });
+});
+try { const t = localStorage.getItem('gerente_tab'); if (t && TABS.some(x => x.dataset.tab === t)) mostrarTab(t); } catch (e) { /* nada */ }
+document.addEventListener('click', (e) => {
+  const k = e.target.closest && e.target.closest('[data-goto]');
+  if (k) { mostrarTab(k.dataset.goto); window.scrollTo({ top: document.querySelector('.tabs').offsetTop - 4, behavior: 'smooth' }); }
+});
+
+// ---------- Tooltip de las gráficas ----------
+const tip = document.createElement('div');
+tip.className = 'tip';
+document.body.appendChild(tip);
+function moverTip(e, x, y) {
+  const t = e.target.closest && e.target.closest('[data-tip]');
+  if (!t) { tip.classList.remove('visible'); return; }
+  tip.innerHTML = t.getAttribute('data-tip');
+  tip.classList.add('visible');
+  const left = Math.max(8, Math.min(x + 14, window.innerWidth - tip.offsetWidth - 8));
+  const top = (y + 18 + tip.offsetHeight > window.innerHeight) ? y - tip.offsetHeight - 12 : y + 18;
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+}
+document.addEventListener('mousemove', (e) => moverTip(e, e.clientX, e.clientY));
+document.addEventListener('touchstart', (e) => { const p = e.touches[0]; if (p) moverTip(e, p.clientX, p.clientY); }, { passive: true });
+window.addEventListener('scroll', () => tip.classList.remove('visible'), { passive: true });
+
+// ---------- Utilidades ----------
+function pctNum(n, d) { return d ? (n / d) * 100 : null; }
+function fmtPct(v) { return v == null ? '—' : (v > 0 && v < 1 ? v.toFixed(1) : Math.round(v)) + '%'; }
+function diasDelPeriodo(desde, hasta) {
+  const out = [];
+  const d = new Date(desde + 'T00:00:00Z'), fin = new Date(hasta + 'T00:00:00Z');
+  let g = 0;
+  while (d <= fin && g < 800) { out.push(d.toISOString().slice(0, 10)); d.setUTCDate(d.getUTCDate() + 1); g++; }
+  return out;
+}
+function diasDelMes(iso) { const p = iso.split('-').map(Number); return new Date(Date.UTC(p[0], p[1], 0)).getUTCDate(); }
+function fechaCorta(iso) { const p = iso.split('-').map(Number); return p[2] + ' ' + MESES_CORTOS[p[1] - 1]; }
+function filaPersona(nombre) { return '<span class="person-cell">' + avatarHtml(nombre) + escH(nombre) + '</span>'; }
+function tablaSimple(cabeceras, filas, totales) {
+  if (!filas.length) return '<div class="empty">Sin datos en este periodo.</div>';
+  return '<div class="table-scroll"><table><thead><tr>' + cabeceras.map(c => '<th' + (c.num ? ' class="num"' : '') + '>' + c.t + '</th>').join('') + '</tr></thead><tbody>' +
+    filas.join('') + (totales || '') + '</tbody></table></div>';
+}
+
+// ============================== Tablero 1 · Leads de campaña ==============================
+function renderCampana(t) {
+  const c = t.campana;
+  const dias = (t.periodo && t.periodo.dias) || 1;
+  const pct = c.meta_periodo ? pctNum(c.total, c.meta_periodo) : null;
+  const elMeta = document.getElementById('campanaMeta');
+  if (c.meta_periodo) {
+    const falta = Math.max(0, c.meta_periodo - c.total);
+    elMeta.innerHTML = '<div class="meta-hero">' +
+      '<div><div class="meta-hero-num">' + fmtPct(pct) + '</div><div class="meta-hero-txt">de la meta del periodo cumplida</div></div>' +
+      '<div class="bullet"><div class="bullet-track" data-tip="<b>' + fmtNum(c.total) + '</b> leads de campaña de una meta de <b>' + fmtNum(c.meta_periodo) + '</b> para este periodo">' +
+      '<div class="bullet-fill" style="width:' + Math.min(100, pct || 0) + '%"></div></div>' +
+      '<div class="bullet-escala"><span>0</span><span>' + fmtNum(c.total) + ' de ' + fmtNum(c.meta_periodo) + (falta ? ' · faltan ' + fmtNum(falta) : ' · meta cumplida') + '</span><span>' + fmtNum(c.meta_periodo) + '</span></div></div>' +
+      '</div>';
+  } else {
+    elMeta.innerHTML = '';
+  }
+  document.getElementById('campanaStats').innerHTML = '<div class="stats-row">' +
+    statCard('target', 'var(--c-positive)', 'Leads de campaña', fmtNum(c.total), c.sin_aceptar ? fmtNum(c.sin_aceptar) + ' todavía sin aceptar en Kommo' : 'todos ya aceptados') +
+    (c.meta_periodo
+      ? statCard('trendingUp', 'var(--c-neutral)', 'Meta del periodo', fmtNum(c.meta_periodo), fmtNum(c.meta_mensual) + ' al mes, proporcional a ' + dias + ' día' + (dias === 1 ? '' : 's')) +
+        statCard('checkCircle', pct >= 100 ? 'var(--c-positive)' : 'var(--c-loss)', '% de meta cumplida', fmtPct(pct), pct >= 100 ? 'meta alcanzada' : 'faltan ' + fmtNum(c.meta_periodo - c.total) + ' leads')
+      : statCard('trendingUp', 'var(--c-neutral)', 'Meta', 'Sin meta', 'todavía no hay meta definida para esta sede')) +
+    statCard('layers', 'var(--ink-soft)', 'Promedio por día', (c.total / dias).toFixed(1), 'leads de campaña al día') +
+    '</div>';
+  const filasA = c.por_asesor.map(a => '<tr><td>' + (a.pendiente ? '<span class="estado ojo">' + escH(a.nombre) + '</span>' : filaPersona(a.nombre)) +
+    '</td><td class="num"><span class="numval">' + fmtNum(a.leads) + '</span><span class="pct">' + fmtPct(pctNum(a.leads, c.total)) + '</span></td></tr>');
+  document.getElementById('campanaPorAsesor').innerHTML = tablaSimple([{ t: 'Asesor' }, { t: 'Leads', num: true }], filasA,
+    '<tr class="totales"><td>Total</td><td class="num"><span class="numval">' + fmtNum(c.total) + '</span></td></tr>');
+  const filasE = c.por_etapa.map(e => '<tr><td>' + escH(e.etapa) + '</td><td class="num"><span class="numval">' + fmtNum(e.leads) + '</span><span class="pct">' + fmtPct(pctNum(e.leads, c.total)) + '</span></td></tr>');
+  document.getElementById('campanaPorEtapa').innerHTML = tablaSimple([{ t: 'Etapa actual' }, { t: 'Leads', num: true }], filasE);
+  document.getElementById('campanaNota').textContent = 'Cómo se cuenta: ' + c.criterio.replace(/pull_licenciaturas|embudo_general|push_licenciaturas/g, k => nombreEmbudo(k));
+}
+
+// ============================== Tablero 2 · Leads vivos ==============================
+function estadoCapacidad(n, tope) {
+  if (!tope) return { cls: '', txt: '' };
+  const p = n / tope;
+  if (p >= 1) return { cls: 'mal', txt: 'Saturado' };
+  if (p >= 0.8) return { cls: 'ojo', txt: 'Cerca del tope' };
+  return { cls: 'bien', txt: 'Con espacio' };
+}
+function renderVivos(t) {
+  const v = t.vivos;
+  const tope = v.tope;
+  const asesores = v.por_asesor.filter(a => a.total > 0);
+  const top = asesores[0];
+  const cerca = asesores.filter(a => tope && a.total >= tope * 0.8).length;
+  document.getElementById('vivosStats').innerHTML = '<div class="stats-row">' +
+    statCard('users', 'var(--ink-soft)', 'Leads vivos con asesores', fmtNum(v.total), 'foto de hoy') +
+    statCard('users', 'var(--ink-soft)', 'Asesores con leads', fmtNum(asesores.length)) +
+    (top ? statCard('layers', 'var(--ink-soft)', 'Con más leads', fmtNum(top.total), escH(top.nombre) + (tope ? ' · ' + fmtPct(pctNum(top.total, tope)) + ' de su tope' : '')) : '') +
+    (tope ? statCard(cerca ? 'xCircle' : 'checkCircle', cerca ? 'var(--c-loss)' : 'var(--c-positive)', 'Cerca del tope o saturados', fmtNum(cerca), 'tope: ' + fmtNum(tope) + ' leads por asesor') : '') +
+    '</div>';
+  const claves = ['pull_licenciaturas', 'embudo_general', 'push_licenciaturas'].filter(k => k in (v.por_embudo || {}) || asesores.some(a => a.por_embudo[k]));
+  const CORTO = { pull_licenciaturas: 'Pull', embudo_general: 'General', push_licenciaturas: 'Push (Hot)' };
+  const titulo = (k) => CORTO[k] || nombreEmbudo(k);
+  const filas = asesores.map(a => {
+    const est = estadoCapacidad(a.total, tope);
+    const p = tope ? Math.min(100, (a.total / tope) * 100) : 0;
+    const desglose = Object.entries(a.por_etapa || {}).sort((x, y) => y[1] - x[1]).map(([e, n]) => escH(e) + ': ' + n).join('<br>');
+    return '<tr><td>' + filaPersona(a.nombre) + '</td>' +
+      claves.map(k => '<td class="num">' + fmtNum(a.por_embudo[k] || 0) + '</td>').join('') +
+      '<td class="num"><span class="numval" style="font-weight:600">' + fmtNum(a.total) + '</span></td>' +
+      (tope ? '<td><div class="cap" data-tip="<b>' + escH(a.nombre) + '</b><br>' + desglose + '"><span class="cap-track"><span class="cap-fill ' + est.cls + '" style="width:' + p + '%"></span></span><span class="cap-txt">' + fmtNum(a.total) + ' / ' + fmtNum(tope) + '</span></div></td>' +
+        '<td><span class="estado ' + est.cls + '">' + est.txt + '</span></td>' : '') +
+      '</tr>';
+  });
+  const tot = '<tr class="totales"><td>Total</td>' + claves.map(k => '<td class="num">' + fmtNum((v.por_embudo || {})[k] || 0) + '</td>').join('') +
+    '<td class="num"><span class="numval">' + fmtNum(v.total) + '</span></td>' + (tope ? '<td></td><td></td>' : '') + '</tr>';
+  document.getElementById('vivosTable').innerHTML = tablaSimple(
+    [{ t: 'Asesor' }].concat(claves.map(k => ({ t: titulo(k), num: true }))).concat([{ t: 'Total', num: true }]).concat(tope ? [{ t: 'Capacidad' }, { t: 'Estado' }] : []),
+    filas, tot);
+  document.getElementById('vivosNota').innerHTML = 'Cómo se cuenta: foto de hoy. <b>Pull Licenciaturas</b> y <b>Embudo general</b> cuentan todas las etapas abiertas (sin los leads entrantes que nadie ha aceptado); <b>Push Licenciaturas</b> solo cuenta lo que la IA ya le pasó al asesor (etapas Hot, Evaluación y Cierre): las bases que atiende la IA no cuentan. No cuentan inscritos ni descartados.' +
+    (tope ? ' Tope: ' + fmtNum(tope) + ' leads por asesor; «Cerca del tope» desde el 80 %.' : '') + ' Pasa el cursor sobre la barra para ver en qué etapas están.';
+}
+
+// ============================== Tablero 3 · Tiempos de respuesta ==============================
+function historialAsignacionHtml(s, zona) {
+  const ev = s.historial || [];
+  if (!ev.length) return '<div class="help" style="margin:0;">No se encontró historial de este lead en Kommo.</div>';
+  const quien = (e) => e.persona ? '<span class="hist-quien">' + escH(e.por) + '</span>' : '<span class="hist-quien">La IA o el sistema</span> <span class="hist-nota">(sin usuario)</span>';
+  let marcado = false;
+  const items = ev.map(e => {
+    let txt;
+    if (e.tipo === 'lead_added') txt = quien(e) + ' creó el lead';
+    else if (e.tipo === 'lead_status_changed') txt = quien(e) + ' lo movió de <b>' + escH(e.de || '?') + '</b> a <b>' + escH(e.a || '?') + '</b>';
+    else if (e.tipo === 'common_note_added') txt = quien(e) + ' escribió una nota';
+    else if (e.tipo === 'task_completed') txt = quien(e) + ' completó una tarea';
+    else if (e.tipo === 'outgoing_chat_message') txt = quien(e) + ' mandó un mensaje';
+    else if (e.tipo === 'outgoing_call') txt = quien(e) + ' hizo una llamada';
+    else if (e.tipo === 'entity_responsible_changed') txt = quien(e) + ' cambió el responsable de <b>' + escH(e.de || '?') + '</b> a <b>' + escH(e.a || '?') + '</b>';
+    else txt = quien(e) + ' · ' + escH(e.tipo);
+    const esAsig = !marcado && e.ts === s.asignado && (s.origen === 'ia' ? e.tipo === 'lead_status_changed' : e.tipo === 'entity_responsible_changed');
+    if (esAsig) marcado = true;
+    return '<li class="' + (e.persona ? 'persona' : '') + (esAsig ? ' entrega' : '') + '"><span class="hist-fecha">' + fmtHoraSede(e.ts, zona) + '</span>' + txt +
+      (esAsig ? ' <span class="hist-marca">← ' + (s.origen === 'ia' ? 'aquí la IA se lo delegó a su asesor' : 'aquí quedó asignado a su asesor') + '</span>' : '') + '</li>';
+  }).join('');
+  const despues = ev.filter(e => e.ts > s.asignado);
+  const deGente = despues.filter(e => e.persona);
+  const resumen = (s.origen === 'ia' ? 'La IA se lo delegó a su asesor el ' : 'Quedó asignado a su asesor el ') + fmtHoraSede(s.asignado, zona) + '. ' +
+    (despues.length ? 'Desde entonces hay ' + despues.length + ' movimiento' + (despues.length === 1 ? '' : 's') + (deGente.length ? ', ' + deGente.length + ' de una persona, pero ninguna nota, mensaje o llamada de su asesor.' : ', todos del sistema o la IA.') : 'Desde entonces no hay ningún movimiento registrado.');
+  const omit = s.historial_omitidos > 0 ? '<div class="help" style="margin:8px 0 0;">Se muestran los últimos ' + ev.length + ' movimientos; hay ' + s.historial_omitidos + ' más antiguos.</div>' : '';
+  return '<p class="hist-resumen">' + resumen + '</p><ul class="hist-lista">' + items + '</ul>' + omit;
+}
+function renderTiempos(t) {
+  const x = t.tiempos;
+  const tt = x.totales;
+  const elS = document.getElementById('tiemposStats'), elT = document.getElementById('tiemposTable'), elL = document.getElementById('tiemposSinAtender');
+  document.getElementById('tiemposNota').textContent = 'Cómo se cuenta: ' + x.criterio;
+  if (!tt.asignados) {
+    elS.innerHTML = ''; elL.innerHTML = '';
+    elT.innerHTML = '<div class="empty">No se asignó ningún lead a los asesores en este periodo con estos filtros.</div>';
+    return;
+  }
+  elS.innerHTML = '<div class="stats-row">' +
+    statCard('users', 'var(--ink-soft)', 'Asignados', fmtNum(tt.asignados), fmtNum(tt.campana) + ' de campaña · ' + fmtNum(tt.ia) + ' de la IA') +
+    statCard('checkCircle', 'var(--c-positive)', 'Atendidos', fmtNum(tt.atendidos), fmtPct(pctNum(tt.atendidos, tt.asignados)) + ' de los asignados') +
+    statCard('xCircle', 'var(--c-loss)', 'Sin atender', fmtNum(tt.sin_atender), 'más de ' + x.umbral_horas + ' h sin nota, mensaje ni llamada') +
+    statCard('clock', 'var(--ink-soft)', 'En plazo', fmtNum(tt.en_plazo), 'asignados hace menos de ' + x.umbral_horas + ' h') +
+    (tt.fuera_de_hot ? statCard('layers', 'var(--ink-soft)', 'Ya no están en Hot', fmtNum(tt.fuera_de_hot), 'la IA los regresó a frío o perdido') : '') +
+    statCard('clock', 'var(--c-neutral)', 'Tiempo de respuesta', fmtHoras(tt.promedio_segundos_habiles), 'promedio en horario laboral · mediana ' + fmtHoras(tt.mediana_segundos_habiles)) +
+    '</div>';
+  const filas = x.por_asesor.map(a => '<tr><td>' + filaPersona(a.nombre) + '</td>' +
+    '<td class="num">' + fmtNum(a.asignados) + '</td><td class="num">' + fmtNum(a.campana) + '</td><td class="num">' + fmtNum(a.ia) + '</td>' +
+    '<td class="num"><span class="numval">' + fmtNum(a.atendidos) + '</span><span class="pct">' + fmtPct(pctNum(a.atendidos, a.asignados)) + '</span></td>' +
+    '<td class="num"' + (a.sin_atender ? ' style="color:var(--c-loss)"' : '') + '>' + fmtNum(a.sin_atender) + '</td>' +
+    '<td class="num">' + fmtNum(a.en_plazo) + '</td><td class="num">' + fmtNum(a.fuera_de_hot) + '</td>' +
+    '<td class="num"><span class="numval" style="font-weight:600">' + fmtHoras(a.promedio_segundos_habiles) + '</span><span class="pct" style="color:var(--ink-faint)">mediana ' + fmtHoras(a.mediana_segundos_habiles) + '</span></td></tr>');
+  const tot = '<tr class="totales"><td>Total</td><td class="num">' + fmtNum(tt.asignados) + '</td><td class="num">' + fmtNum(tt.campana) + '</td><td class="num">' + fmtNum(tt.ia) + '</td>' +
+    '<td class="num"><span class="numval">' + fmtNum(tt.atendidos) + '</span><span class="pct">' + fmtPct(pctNum(tt.atendidos, tt.asignados)) + '</span></td><td class="num">' + fmtNum(tt.sin_atender) + '</td>' +
+    '<td class="num">' + fmtNum(tt.en_plazo) + '</td><td class="num">' + fmtNum(tt.fuera_de_hot) + '</td><td class="num"><span class="numval">' + fmtHoras(tt.promedio_segundos_habiles) + '</span><span class="pct" style="color:var(--ink-faint)">mediana ' + fmtHoras(tt.mediana_segundos_habiles) + '</span></td></tr>';
+  elT.innerHTML = tablaSimple([{ t: 'Asesor' }, { t: 'Asignados', num: true }, { t: 'De campaña', num: true }, { t: 'De la IA', num: true }, { t: 'Atendidos', num: true }, { t: 'Sin atender', num: true }, { t: 'En plazo', num: true }, { t: 'Ya no en Hot', num: true }, { t: 'Tiempo promedio', num: true }], filas, tot);
+
+  const lista = x.sin_atender || [];
+  if (!lista.length) { elL.innerHTML = '<div class="empty">No hay leads asignados sin atender. 👍</div>'; return; }
+  const zona = t.zona_horas;
+  const filasL = lista.map((s, i) => {
+    const cuanto = haceCuanto(s.asignado);
+    return '<tr><td>' + personConCorreoHtml(s.nombre, null, s.lead_id) + '</td>' +
+      '<td><span class="estado">' + (s.origen === 'ia' ? 'Delegado por la IA' : 'Campaña') + '</span></td>' +
+      '<td>' + embudoPillHtml(s.embudo) + '</td><td>' + (s.etapa ? pillHtml(s.etapa) : '—') + '</td>' +
+      '<td>' + (s.responsible_user_id ? escH(nombreAgente(s.responsible_user_id)) : '—') + '</td>' +
+      '<td class="num"' + (cuanto.dias != null && cuanto.dias >= 3 ? ' style="color:var(--c-loss)"' : '') + '>' + cuanto.texto + '</td>' +
+      '<td><button type="button" class="btn-hist" data-hist="t' + i + '">Ver qué pasó</button></td></tr>' +
+      '<tr class="hist-row" id="hist-t' + i + '" hidden><td colspan="7"><div class="hist-box">' + historialAsignacionHtml(s, zona) + '</div></td></tr>';
+  }).join('');
+  const extra = x.total_sin_atender > lista.length ? '<div class="help" style="margin-top:8px;">Se muestran los ' + lista.length + ' más antiguos de ' + x.total_sin_atender + '.</div>' : '';
+  elL.innerHTML = '<div class="table-scroll" style="max-height:560px; overflow-y:auto;"><table><thead><tr><th>Lead</th><th>Origen</th><th>Embudo</th><th>Etapa</th><th>Asesor</th><th class="num">Asignado</th><th>Historial</th></tr></thead><tbody>' + filasL + '</tbody></table></div>' + extra;
+  elL.onclick = (ev) => {
+    const b = ev.target.closest && ev.target.closest('.btn-hist');
+    if (!b) return;
+    const fila = document.getElementById('hist-' + b.dataset.hist);
+    if (!fila) return;
+    fila.hidden = !fila.hidden;
+    b.textContent = fila.hidden ? 'Ver qué pasó' : 'Ocultar';
+  };
+}
+
+// ============================== Lo que recibe la IA ==============================
+function renderIA(adv) {
+  const ia = adv.resumen_ia || {};
+  document.getElementById('iaResumen').innerHTML =
+    '<div class="stat-icon" style="--stat-color:var(--c-neutral)">' + icon('barChart', 'var(--c-neutral)', 24) + '</div>' +
+    '<div class="ia-callout-body">' +
+      '<div class="ia-callout-title">La IA recibió <span class="ia-callout-num">' + fmtNum(ia.leads_nuevos) + '</span> leads nuevos en el periodo y los atiende primero.</div>' +
+      '<div class="ia-callout-text">En el periodo le pasó ' + fmtNum(ia.delegados_ia) + ' a los asesores (a una etapa Hot). Lo demás (bases importadas, leads fríos) se queda con la IA y no cuenta en los tableros de los asesores. Aquí no se audita a la IA.</div>' +
+    '</div>';
+}
+
+// ============================== Resumen ==============================
+function renderResumen(t, closed) {
+  const c = t.campana, v = t.vivos, tt = t.tiempos.totales;
+  const pct = c.meta_periodo ? pctNum(c.total, c.meta_periodo) : null;
+  const top = v.por_asesor.filter(a => a.total > 0)[0];
+  const inscritos = Object.values((closed && closed.por_embudo) || {}).reduce((s, e) => s + (e.ganado || 0), 0);
+  const kpi = (goto, label, valor, sub) => '<button type="button" class="kpi" data-goto="' + goto + '"><div class="kpi-label">' + label + '</div><div class="kpi-valor">' + valor + '</div><div class="kpi-sub">' + sub + '</div><div class="kpi-ir">Ver detalle →</div></button>';
+  document.getElementById('resumenKpis').innerHTML =
+    kpi('prospectos', 'Leads de campaña', fmtNum(c.total), c.meta_periodo ? fmtPct(pct) + ' de la meta del periodo (' + fmtNum(c.meta_periodo) + ')' : 'llegaron por formulario de Facebook') +
+    kpi('prospectos', 'Leads vivos con asesores', fmtNum(v.total), top ? 'con más leads: ' + escH(top.nombre.split(' ')[0]) + ' con ' + fmtNum(top.total) + (v.tope ? ' de ' + fmtNum(v.tope) : '') : 'foto de hoy') +
+    kpi('calidad', 'Tiempo de respuesta', fmtHoras(tt.promedio_segundos_habiles), 'promedio en horario laboral · mediana ' + fmtHoras(tt.mediana_segundos_habiles)) +
+    kpi('calidad', 'Asignados sin atender', fmtNum(tt.sin_atender), 'de ' + fmtNum(tt.asignados) + ' asignados, más de ' + t.tiempos.umbral_horas + ' h sin contacto') +
+    kpi('cierre', 'Inscritos', fmtNum(inscritos), 'registrados en el periodo');
+
+  const li = (cls, html) => '<li class="' + cls + '">' + html + '</li>';
+  const sinAceptarTxt = c.sin_aceptar ? ' ' + fmtNum(c.sin_aceptar) + (c.sin_aceptar === 1 ? ' sigue' : ' siguen') + ' sin aceptar en Kommo.' : '';
+  const lineas = [];
+  // Campaña
+  if (c.meta_periodo) lineas.push(li(pct >= 100 ? 'bien' : pct >= 70 ? 'ojo' : 'mal', '<b>Campaña:</b> llegaron ' + fmtNum(c.total) + ' leads por formulario, el ' + fmtPct(pct) + ' de la meta del periodo (' + fmtNum(c.meta_periodo) + ').' + sinAceptarTxt));
+  else lineas.push(li('', '<b>Campaña:</b> llegaron ' + fmtNum(c.total) + ' leads por formulario (' + (c.total / ((t.periodo && t.periodo.dias) || 1)).toFixed(1) + ' al día).' + sinAceptarTxt));
+  // Vivos
+  if (top) {
+    const sat = v.por_asesor.filter(a => v.tope && a.total >= v.tope);
+    const cerca = v.por_asesor.filter(a => v.tope && a.total >= v.tope * 0.8 && a.total < v.tope);
+    lineas.push(li(sat.length ? 'mal' : cerca.length ? 'ojo' : 'bien', '<b>Leads vivos:</b> ' + fmtNum(v.total) + ' entre ' + v.por_asesor.filter(a => a.total > 0).length + ' asesores; quien tiene más es ' + escH(top.nombre) + ' con ' + fmtNum(top.total) + (v.tope ? ' (' + fmtPct(pctNum(top.total, v.tope)) + ' de su tope de ' + fmtNum(v.tope) + ')' : '') + '.' +
+      (sat.length ? ' Saturados: ' + sat.map(a => escH(a.nombre)).join(', ') + '.' : cerca.length ? ' Cerca del tope: ' + cerca.map(a => escH(a.nombre)).join(', ') + '.' : ' Nadie está cerca del tope.')));
+  }
+  // Tiempos
+  if (tt.asignados) {
+    const prom = tt.promedio_segundos_habiles;
+    lineas.push(li(prom == null ? 'mal' : prom <= 3600 ? 'bien' : prom <= 3 * 3600 ? 'ojo' : 'mal', '<b>Tiempo de respuesta:</b> ' + (prom == null ? 'ningún lead asignado tuvo nota, mensaje o llamada de su asesor' : 'promedio de ' + fmtHoras(prom) + ' en horario laboral (mediana ' + fmtHoras(tt.mediana_segundos_habiles) + ')') + '; se atendió el ' + fmtPct(pctNum(tt.atendidos, tt.asignados)) + ' de los ' + fmtNum(tt.asignados) + ' asignados.'));
+    const peor = t.tiempos.por_asesor.filter(a => a.sin_atender > 0).sort((a, b) => b.sin_atender - a.sin_atender)[0];
+    lineas.push(li(tt.sin_atender ? 'mal' : 'bien', tt.sin_atender
+      ? '<b>Sin atender:</b> ' + fmtNum(tt.sin_atender) + ' leads asignados llevan más de ' + t.tiempos.umbral_horas + ' h sin nota, mensaje ni llamada' + (peor ? '; quien más tiene: ' + escH(peor.nombre) + ' (' + fmtNum(peor.sin_atender) + ')' : '') + '.'
+      : '<b>Sin atender:</b> ningún lead asignado lleva más de ' + t.tiempos.umbral_horas + ' h sin contacto.'));
+  } else {
+    lineas.push(li('', '<b>Tiempo de respuesta:</b> no se asignó ningún lead a los asesores en este periodo.'));
+  }
+  lineas.push(li('', '<b>Inscritos:</b> ' + fmtNum(inscritos) + ' registrados en el periodo.'));
+  document.getElementById('resumenLectura').innerHTML = lineas.join('');
+}
+
+// ============================== Tendencias (SVG propio, se dibuja al abrir la pestaña) ==============================
+function escalaBonita(max) {
+  if (!max || max <= 0) return { tope: 4, pasos: [0, 1, 2, 3, 4] };
+  const crudo = max / 4;
+  const mag = Math.pow(10, Math.floor(Math.log10(crudo)));
+  const paso = [1, 2, 2.5, 5, 10].map(m => m * mag).find(p => p >= crudo) || 10 * mag;
+  const tope = Math.ceil(max / paso) * paso;
+  const pasos = [];
+  for (let v = 0; v <= tope + 1e-9; v += paso) pasos.push(Math.round(v * 100) / 100);
+  return { tope, pasos };
+}
+function barraPath(x, y, w, h, r) {
+  if (h <= 0 || w <= 0) return '';
+  r = Math.min(r, w / 2, h);
+  return 'M' + x + ',' + (y + h) + 'V' + (y + r) + 'Q' + x + ',' + y + ' ' + (x + r) + ',' + y + 'H' + (x + w - r) + 'Q' + (x + w) + ',' + y + ' ' + (x + w) + ',' + (y + r) + 'V' + (y + h) + 'Z';
+}
+// Marco común: ejes, rejilla y etiquetas del eje X (salteadas si no caben)
+function marco(ancho, alto, etiquetas, escala, fmtY) {
+  const M = { l: 44, r: 16, t: 12, b: 26 };
+  const W = ancho - M.l - M.r, H = alto - M.t - M.b;
+  const n = etiquetas.length;
+  const banda = n ? W / n : W;
+  const y = (v) => M.t + H - (v / escala.tope) * H;
+  let svg = '';
+  escala.pasos.forEach(p => {
+    svg += '<line class="' + (p === 0 ? 'base' : 'rejilla') + '" x1="' + M.l + '" x2="' + (M.l + W) + '" y1="' + y(p) + '" y2="' + y(p) + '"/>';
+    svg += '<text class="eje" x="' + (M.l - 8) + '" y="' + (y(p) + 4) + '" text-anchor="end">' + fmtY(p) + '</text>';
+  });
+  const cada = Math.max(1, Math.ceil(n / Math.max(1, Math.floor(W / 56))));
+  etiquetas.forEach((e, i) => {
+    if (i % cada !== 0 && i !== n - 1) return;
+    if (i === n - 1 && i % cada !== 0 && (n - 1) % cada < cada / 2) return;
+    svg += '<text class="eje" x="' + (M.l + banda * i + banda / 2) + '" y="' + (alto - 6) + '" text-anchor="middle">' + escH(e) + '</text>';
+  });
+  return { svg, M, W, H, banda, y };
+}
+function svgCaja(ancho, alto, interior, etiqueta) {
+  return '<svg width="' + ancho + '" height="' + alto + '" viewBox="0 0 ' + ancho + ' ' + alto + '" role="img" aria-label="' + escH(etiqueta) + '">' + interior + '</svg>';
+}
+function graficaBarras(el, etiquetas, series, opciones) {
+  const ancho = el.clientWidth;
+  if (!ancho) return;
+  const alto = opciones.alto || 220;
+  const max = Math.max(0, ...series.flatMap(s => s.valores.map(v => v || 0)));
+  const esc = escalaBonita(max);
+  const f = marco(ancho, alto, etiquetas, esc, opciones.fmtY || (v => fmtNum(v)));
+  let svg = f.svg;
+  const ns = series.length;
+  const anchoBarra = Math.max(2, Math.min(28, (f.banda - 6) / ns - 2));
+  etiquetas.forEach((e, i) => {
+    const x0 = f.M.l + f.banda * i + (f.banda - (anchoBarra * ns + 2 * (ns - 1))) / 2;
+    series.forEach((s, k) => {
+      const v = s.valores[i] || 0;
+      const yv = f.y(v);
+      svg += '<path d="' + barraPath(x0 + k * (anchoBarra + 2), yv, anchoBarra, f.M.t + f.H - yv, 4) + '" fill="' + s.color + '"/>';
+    });
+    svg += '<rect class="hit" x="' + (f.M.l + f.banda * i) + '" y="' + f.M.t + '" width="' + f.banda + '" height="' + f.H + '" data-tip="' + escH(opciones.tip(i)) + '"/>';
+  });
+  el.innerHTML = svgCaja(ancho, alto, svg, opciones.titulo);
+}
+function graficaLineas(el, etiquetas, series, opciones) {
+  const ancho = el.clientWidth;
+  if (!ancho) return;
+  const alto = opciones.alto || 240;
+  const max = Math.max(0, ...series.flatMap(s => s.valores.map(v => v || 0)));
+  const esc = escalaBonita(max);
+  const f = marco(ancho, alto, etiquetas, esc, v => fmtNum(v));
+  let svg = f.svg;
+  const xDe = (i) => f.M.l + f.banda * i + f.banda / 2;
+  series.forEach(s => {
+    const pts = s.valores.map((v, i) => xDe(i) + ',' + f.y(v || 0)).join(' ');
+    svg += '<polyline points="' + pts + '" fill="none" stroke="' + s.color + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"' + (s.punteada ? ' stroke-dasharray="5 4"' : '') + '/>';
+    const u = s.valores.length - 1;
+    if (u >= 0) svg += '<circle cx="' + xDe(u) + '" cy="' + f.y(s.valores[u] || 0) + '" r="4" fill="' + s.color + '" stroke="var(--surface)" stroke-width="2"/>';
+  });
+  etiquetas.forEach((e, i) => {
+    svg += '<rect class="hit" x="' + (f.M.l + f.banda * i) + '" y="' + f.M.t + '" width="' + f.banda + '" height="' + f.H + '" data-tip="' + escH(opciones.tip(i)) + '"/>';
+  });
+  el.innerHTML = svgCaja(ancho, alto, svg, opciones.titulo);
+}
+function dibujarTendencias() {
+  if (!tabData) return;
+  const pane = document.querySelector('.tab-pane[data-pane="tendencias"]');
+  if (!pane || pane.hidden) return;
+  const c = tabData.campana, x = tabData.tiempos;
+  const dias = diasDelPeriodo(tabData.periodo.from, tabData.periodo.to);
+  const etiquetasDia = dias.map(fechaCorta);
+  const diarios = dias.map(d => (c.por_dia || {})[d] || 0);
+  let acum = 0;
+  const acumulado = diarios.map(v => (acum += v));
+  let am = 0;
+  const metaRitmo = c.meta_mensual ? dias.map(d => Math.round((am += c.meta_mensual / diasDelMes(d)))) : null;
+  const VERDE = 'var(--c-positive)', GRIS = 'var(--c-meta)';
+  document.getElementById('leyendaAcumulado').innerHTML = '<span><i style="background:' + VERDE + '"></i>Leads de campaña acumulados</span>' +
+    (metaRitmo ? '<span><i style="background:repeating-linear-gradient(90deg,' + GRIS + ' 0 5px,transparent 5px 9px)"></i>Ritmo de la meta (' + fmtNum(c.meta_mensual) + ' al mes)</span>' : '<span class="help" style="margin:0">Sin meta definida para esta sede</span>');
+  graficaLineas(document.getElementById('graficaAcumulado'), etiquetasDia,
+    [{ valores: acumulado, color: VERDE }].concat(metaRitmo ? [{ valores: metaRitmo, color: GRIS, punteada: true }] : []),
+    { titulo: 'Leads de campaña acumulados', tip: i => '<b>' + etiquetasDia[i] + '</b><br>Acumulado: ' + fmtNum(acumulado[i]) + (metaRitmo ? '<br>Meta a esa fecha: ' + fmtNum(metaRitmo[i]) + ' (' + fmtPct(pctNum(acumulado[i], metaRitmo[i])) + ')' : '') });
+  graficaBarras(document.getElementById('graficaDiaria'), etiquetasDia, [{ valores: diarios, color: VERDE }],
+    { titulo: 'Leads de campaña por día', alto: 200, tip: i => '<b>' + etiquetasDia[i] + '</b><br>' + fmtNum(diarios[i]) + ' lead' + (diarios[i] === 1 ? '' : 's') + ' de campaña' });
+  const sem = x.semanas || [];
+  const etiquetasSem = sem.map(s => 'sem ' + fechaCorta(s.semana));
+  const elR = document.getElementById('graficaRespuesta');
+  if (!sem.length) { elR.innerHTML = '<div class="empty">Sin leads asignados en el periodo.</div>'; }
+  else graficaBarras(elR, etiquetasSem, [{ valores: sem.map(s => s.promedio_segundos_habiles == null ? 0 : s.promedio_segundos_habiles / 3600), color: 'var(--c-neutral)' }],
+    { titulo: 'Tiempo de respuesta promedio por semana', alto: 200, fmtY: v => v + ' h',
+      tip: i => '<b>Semana del ' + fechaCorta(sem[i].semana) + '</b><br>Promedio: ' + fmtHoras(sem[i].promedio_segundos_habiles) + '<br>' + fmtNum(sem[i].atendidos) + ' atendidos de ' + fmtNum(sem[i].asignados) });
+  document.getElementById('leyendaAsignados').innerHTML = '<span><i class="cuadro" style="background:' + GRIS + '"></i>Asignados</span><span><i class="cuadro" style="background:' + VERDE + '"></i>Atendidos</span>';
+  const elA = document.getElementById('graficaAsignados');
+  if (!sem.length) { elA.innerHTML = '<div class="empty">Sin leads asignados en el periodo.</div>'; }
+  else graficaBarras(elA, etiquetasSem, [{ valores: sem.map(s => s.asignados), color: GRIS }, { valores: sem.map(s => s.atendidos), color: VERDE }],
+    { titulo: 'Asignados y atendidos por semana', alto: 200,
+      tip: i => '<b>Semana del ' + fechaCorta(sem[i].semana) + '</b><br>Asignados: ' + fmtNum(sem[i].asignados) + '<br>Atendidos: ' + fmtNum(sem[i].atendidos) + '<br>Sin atender: ' + fmtNum(sem[i].sin_atender) });
+}
+let esperaResize = null;
+window.addEventListener('resize', () => { clearTimeout(esperaResize); esperaResize = setTimeout(dibujarTendencias, 150); });
 </script>
 </body>
 </html>
